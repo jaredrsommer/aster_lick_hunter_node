@@ -2734,4 +2734,68 @@ logErrorWithTimestamp('PositionManager: Failed to refresh balance:', error);
   public getPositionsMap(): Map<string, ExchangePosition> {
     return this.currentPositions;
   }
+
+  // Get position count for a specific symbol and side
+  public getPositionCountForSymbolSide(symbol: string, side: 'LONG' | 'SHORT'): number {
+    let count = 0;
+    const positionSide = this.isHedgeMode ? side : 'BOTH';
+
+    for (const position of this.currentPositions.values()) {
+      if (position.symbol === symbol && Math.abs(parseFloat(position.positionAmt)) > 0) {
+        // In hedge mode, match exact position side
+        if (this.isHedgeMode) {
+          if (position.positionSide === positionSide) {
+            count++;
+          }
+        } else {
+          // In one-way mode, check direction based on position amount
+          const isLong = parseFloat(position.positionAmt) > 0;
+          if ((side === 'LONG' && isLong) || (side === 'SHORT' && !isLong)) {
+            count++;
+          }
+        }
+      }
+    }
+
+    return count;
+  }
+
+  // Check if a new position can be opened based on per-pair limits
+  public canOpenPosition(symbol: string, side: 'LONG' | 'SHORT'): { allowed: boolean; reason?: string } {
+    const symbolConfig = this.config.symbols[symbol];
+
+    if (!symbolConfig) {
+      return {
+        allowed: false,
+        reason: `Symbol ${symbol} not configured`
+      };
+    }
+
+    // Get current position count for this symbol-side
+    const currentCount = this.getPositionCountForSymbolSide(symbol, side);
+
+    // Determine the max allowed positions for this side
+    let maxAllowed: number | undefined;
+
+    if (side === 'LONG') {
+      maxAllowed = symbolConfig.maxLongPositions || symbolConfig.maxPositionsPerPair;
+    } else {
+      maxAllowed = symbolConfig.maxShortPositions || symbolConfig.maxPositionsPerPair;
+    }
+
+    // If no limit configured, allow the position
+    if (maxAllowed === undefined) {
+      return { allowed: true };
+    }
+
+    // Check if limit would be exceeded
+    if (currentCount >= maxAllowed) {
+      return {
+        allowed: false,
+        reason: `Max ${side} positions (${maxAllowed}) reached for ${symbol}. Current: ${currentCount}`
+      };
+    }
+
+    return { allowed: true };
+  }
 }

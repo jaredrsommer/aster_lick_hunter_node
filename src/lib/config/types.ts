@@ -30,6 +30,11 @@ export const symbolConfigSchema = z.object({
 
   // Threshold system settings
   useThreshold: z.boolean().optional(),
+
+  // Position limit settings (per symbol)
+  maxPositionsPerPair: z.number().min(1).max(20).optional(), // Default: unlimited
+  maxLongPositions: z.number().min(1).max(20).optional(), // Override for longs
+  maxShortPositions: z.number().min(1).max(20).optional(), // Override for shorts
 }).refine(data => {
   // Ensure we have either legacy or new volume thresholds
   return data.volumeThresholdUSDT !== undefined ||

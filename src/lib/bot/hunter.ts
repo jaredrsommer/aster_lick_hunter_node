@@ -747,6 +747,26 @@ logWithTimestamp(`Hunter: Skipping trade - max positions reached (current: ${cur
           return;
         }
 
+        // Check per-pair position limits
+        const positionSide = side === 'BUY' ? 'LONG' : 'SHORT';
+        const canOpen = this.positionTracker.canOpenPosition(symbol, positionSide);
+
+        if (!canOpen.allowed) {
+logWithTimestamp(`Hunter: Skipping trade - ${canOpen.reason}`);
+
+          // Broadcast trade blocked event to UI
+          if (this.statusBroadcaster) {
+            this.statusBroadcaster.broadcastTradeBlocked({
+              symbol,
+              side: positionSide,
+              reason: canOpen.reason || 'Position limit reached',
+              blockType: 'POSITION_LIMIT'
+            });
+          }
+
+          return;
+        }
+
         // Note: Periodic cleanup now happens automatically every 30 seconds
 
         // Check symbol-specific margin limit
