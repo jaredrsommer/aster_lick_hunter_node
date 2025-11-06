@@ -69,6 +69,13 @@ export const rateLimitConfigSchema = z.object({
   maxConcurrentRequests: z.number().min(1).max(10).optional(),
 }).optional();
 
+export const copyTradingConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  syncTPSL: z.boolean().default(true), // Auto-sync TP/SL changes from master
+  syncClose: z.boolean().default(true), // Auto-close when master closes
+  delayMs: z.number().default(0), // Optional delay between master and follower trades
+}).optional();
+
 export const globalConfigSchema = z.object({
   riskPercent: z.number().min(0).max(100),
   paperMode: z.boolean(),
@@ -77,6 +84,7 @@ export const globalConfigSchema = z.object({
   useThresholdSystem: z.boolean().optional(),
   server: serverConfigSchema,
   rateLimit: rateLimitConfigSchema,
+  copyTrading: copyTradingConfigSchema,
 });
 
 export const configSchema = z.object({

@@ -62,6 +62,54 @@ export class Database {
 
       CREATE INDEX IF NOT EXISTS idx_liquidations_symbol_event_time
         ON liquidations(symbol, event_time);
+
+      CREATE TABLE IF NOT EXISTS follower_wallets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        api_key TEXT NOT NULL,
+        secret_key TEXT NOT NULL,
+        enabled INTEGER DEFAULT 1,
+        position_size_multiplier REAL DEFAULT 1.0,
+        max_positions_per_pair INTEGER DEFAULT 2,
+        symbols_filter TEXT,
+        created_at INTEGER DEFAULT (strftime('%s', 'now')),
+        updated_at INTEGER DEFAULT (strftime('%s', 'now'))
+      );
+
+      CREATE TABLE IF NOT EXISTS follower_positions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        wallet_id INTEGER NOT NULL,
+        master_order_id INTEGER,
+        symbol TEXT NOT NULL,
+        side TEXT NOT NULL,
+        position_side TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        entry_price REAL NOT NULL,
+        leverage INTEGER NOT NULL,
+        tp_order_id INTEGER,
+        sl_order_id INTEGER,
+        tp_price REAL,
+        sl_price REAL,
+        status TEXT DEFAULT 'open',
+        opened_at INTEGER NOT NULL,
+        closed_at INTEGER,
+        close_price REAL,
+        pnl REAL,
+        error_message TEXT,
+        FOREIGN KEY (wallet_id) REFERENCES follower_wallets(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_follower_positions_wallet_id
+        ON follower_positions(wallet_id);
+
+      CREATE INDEX IF NOT EXISTS idx_follower_positions_status
+        ON follower_positions(status);
+
+      CREATE INDEX IF NOT EXISTS idx_follower_positions_symbol
+        ON follower_positions(symbol);
+
+      CREATE INDEX IF NOT EXISTS idx_follower_positions_master_order
+        ON follower_positions(master_order_id);
     `;
 
     this.db.exec(schema, (err) => {
