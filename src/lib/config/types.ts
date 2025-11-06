@@ -76,6 +76,24 @@ export const copyTradingConfigSchema = z.object({
   delayMs: z.number().default(0), // Optional delay between master and follower trades
 }).optional();
 
+export const telegramNotificationsSchema = z.object({
+  positionOpened: z.boolean().default(true),
+  positionClosed: z.boolean().default(true),
+  stopLossHit: z.boolean().default(true),
+  takeProfitHit: z.boolean().default(true),
+  tradeBlocked: z.boolean().default(true),
+  errors: z.boolean().default(true),
+  lowBalance: z.boolean().default(true),
+  lowBalanceThreshold: z.number().default(100), // USDT
+}).optional();
+
+export const telegramConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  botToken: z.string().optional(),
+  chatId: z.string().optional(),
+  notifications: telegramNotificationsSchema,
+}).optional();
+
 export const globalConfigSchema = z.object({
   riskPercent: z.number().min(0).max(100),
   paperMode: z.boolean(),
@@ -85,6 +103,7 @@ export const globalConfigSchema = z.object({
   server: serverConfigSchema,
   rateLimit: rateLimitConfigSchema,
   copyTrading: copyTradingConfigSchema,
+  telegram: telegramConfigSchema,
 });
 
 export const configSchema = z.object({
