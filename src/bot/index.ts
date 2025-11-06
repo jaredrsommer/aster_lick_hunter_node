@@ -17,6 +17,8 @@ import { getRateLimitManager } from '../lib/api/rateLimitManager';
 import { startRateLimitLogging } from '../lib/api/rateLimitMonitor';
 import { initializeRateLimitToasts } from '../lib/api/rateLimitToasts';
 import { thresholdMonitor } from '../lib/services/thresholdMonitor';
+import { copyTradingService } from '../lib/services/copyTradingService';
+import { telegramService } from '../lib/services/telegramService';
 import { logWithTimestamp, logErrorWithTimestamp, logWarnWithTimestamp } from '../lib/utils/timestamp';
 
 // Helper function to kill all child processes (synchronous for exit handler)
@@ -372,6 +374,68 @@ logErrorWithTimestamp('⚠️  Position Manager failed to start:', error.message
         }
       }
 
+      // Initialize Copy Trading Service
+      if (this.config.global.copyTrading?.enabled && hasValidApiKeys) {
+        try {
+          await copyTradingService.initialize({
+            enabled: true,
+            syncTPSL: this.config.global.copyTrading.syncTPSL ?? true,
+            syncClose: this.config.global.copyTrading.syncClose ?? true,
+            delayMs: this.config.global.copyTrading.delayMs ?? 0,
+          });
+
+          // Connect copy trading service to status broadcaster for UI updates
+          copyTradingService.on('copyTradeCompleted', (data: any) => {
+            logWithTimestamp(`Copy Trading: ${data.successful}/${data.totalFollowers} followers synced for ${data.symbol}`);
+            this.statusBroadcaster.broadcast('copy_trade_completed', data);
+          });
+
+          copyTradingService.on('followerPositionOpened', (data: any) => {
+            logWithTimestamp(`Copy Trading: ${data.walletName} - Position opened for ${data.symbol}`);
+            this.statusBroadcaster.broadcast('follower_position_opened', data);
+          });
+
+          copyTradingService.on('followerPositionClosed', (data: any) => {
+            logWithTimestamp(`Copy Trading: ${data.walletName} - Position closed, PnL: ${data.pnl.toFixed(2)} USDT`);
+            this.statusBroadcaster.broadcast('follower_position_closed', data);
+          });
+
+logWithTimestamp('✅ Copy Trading Service initialized');
+        } catch (error: any) {
+logErrorWithTimestamp('⚠️  Copy Trading Service failed to initialize:', error.message);
+          this.statusBroadcaster.addError(`Copy Trading: ${error.message}`);
+        }
+      } else if (this.config.global.copyTrading?.enabled && !hasValidApiKeys) {
+logWarnWithTimestamp('⚠️  Copy Trading is enabled but no API keys configured - Copy Trading will not function');
+      }
+
+      // Initialize Telegram Bot Service
+      if (this.config.global.telegram?.enabled) {
+        try {
+          await telegramService.initialize({
+            enabled: true,
+            botToken: this.config.global.telegram.botToken,
+            chatId: this.config.global.telegram.chatId,
+            notifications: this.config.global.telegram.notifications,
+          });
+
+          // Listen for command requests and handle them
+          telegramService.on('commandRequest', async (data: any) => {
+            this.handleTelegramCommand(data);
+          });
+
+          telegramService.on('chatIdDiscovered', (chatId: string) => {
+            logWithTimestamp(`Telegram: Chat ID discovered: ${chatId}`);
+            this.statusBroadcaster.broadcast('telegram_chat_id', { chatId });
+          });
+
+logWithTimestamp('✅ Telegram Bot Service initialized');
+        } catch (error: any) {
+logErrorWithTimestamp('⚠️  Telegram Bot Service failed to initialize:', error.message);
+          this.statusBroadcaster.addError(`Telegram Bot: ${error.message}`);
+        }
+      }
+
       // Initialize Hunter
       this.hunter = new Hunter(this.config, this.isHedgeMode);
 
@@ -443,6 +507,33 @@ logWithTimestamp(`📊 Added price streaming for new position: ${data.symbol}`);
             });
           }, 1000);
         }
+
+        // Trigger copy trading if enabled
+        if (copyTradingService.isEnabled() && data.orderId) {
+          copyTradingService.onMasterPositionOpened({
+            orderId: data.orderId,
+            symbol: data.symbol,
+            side: data.side,
+            positionSide: data.positionSide || (data.side === 'BUY' ? 'LONG' : 'SHORT'),
+            quantity: data.quantity,
+            price: data.price,
+            leverage: data.leverage || 1
+          }).catch(error => {
+            logErrorWithTimestamp('Copy Trading: Error copying position:', error);
+          });
+        }
+
+        // Send Telegram notification if enabled
+        if (telegramService.isEnabled()) {
+          telegramService.sendPositionOpened({
+            symbol: data.symbol,
+            side: data.positionSide || (data.side === 'BUY' ? 'LONG' : 'SHORT'),
+            quantity: data.quantity,
+            entryPrice: data.price
+          }).catch(error => {
+            logErrorWithTimestamp('Telegram: Error sending notification:', error);
+          });
+        }
       });
 
       this.hunter.on('error', (error: any) => {
@@ -499,6 +590,96 @@ logErrorWithTimestamp('❌ Unhandled rejection at:', promise, 'reason:', reason)
     } catch (error) {
 logErrorWithTimestamp('❌ Failed to start bot:', error);
       process.exit(1);
+    }
+  }
+
+  private async handleTelegramCommand(data: any): Promise<void> {
+    const { command, chatId, args } = data;
+
+    try {
+      switch (command) {
+        case 'status':
+          const balanceService = getBalanceService();
+          const balance = balanceService?.getCurrentBalance();
+          const positions = this.positionManager?.getPositions() || [];
+          const openPositions = positions.filter(p => Math.abs(parseFloat(p.positionAmt)) > 0);
+
+          const statusMsg = `
+🤖 <b>Bot Status</b>
+
+Status: ${this.isRunning ? '✅ Running' : '❌ Stopped'}
+Mode: ${this.config?.global.paperMode ? '📝 Paper' : '💰 Live'}
+Position Mode: ${this.isHedgeMode ? 'Hedge' : 'One-Way'}
+
+<b>Balance:</b>
+Total: $${balance?.totalBalance.toFixed(2) || 'N/A'}
+Available: $${balance?.availableBalance.toFixed(2) || 'N/A'}
+
+<b>Positions:</b>
+Open: ${openPositions.length}
+Max Allowed: ${this.config?.global.maxOpenPositions || 'N/A'}
+          `;
+
+          await telegramService.sendCommandResponse(chatId, statusMsg);
+          break;
+
+        case 'positions':
+          const allPositions = this.positionManager?.getPositions() || [];
+          const activePositions = allPositions.filter(p => Math.abs(parseFloat(p.positionAmt)) > 0);
+
+          if (activePositions.length === 0) {
+            await telegramService.sendCommandResponse(chatId, 'No open positions');
+            return;
+          }
+
+          let posMsg = '<b>Open Positions:</b>\n\n';
+          activePositions.forEach(pos => {
+            const side = parseFloat(pos.positionAmt) > 0 ? 'LONG' : 'SHORT';
+            const pnl = parseFloat(pos.unRealizedProfit || '0');
+            const pnlEmoji = pnl >= 0 ? '🟢' : '🔴';
+            posMsg += `${pos.symbol} ${side}\n`;
+            posMsg += `  Qty: ${Math.abs(parseFloat(pos.positionAmt))}\n`;
+            posMsg += `  Entry: $${parseFloat(pos.entryPrice).toFixed(2)}\n`;
+            posMsg += `  PnL: ${pnlEmoji} $${pnl.toFixed(2)}\n\n`;
+          });
+
+          await telegramService.sendCommandResponse(chatId, posMsg);
+          break;
+
+        case 'balance':
+          const bal = getBalanceService()?.getCurrentBalance();
+          const balMsg = `
+<b>Account Balance</b>
+
+Total: $${bal?.totalBalance.toFixed(2) || 'N/A'}
+Available: $${bal?.availableBalance.toFixed(2) || 'N/A'}
+Used: $${((bal?.totalBalance || 0) - (bal?.availableBalance || 0)).toFixed(2)}
+Position Value: $${bal?.totalPositionValue.toFixed(2) || 'N/A'}
+          `;
+          await telegramService.sendCommandResponse(chatId, balMsg);
+          break;
+
+        case 'pause':
+          // Add pause logic here
+          await telegramService.sendCommandResponse(chatId, '⏸️ Trading paused (not implemented yet)');
+          break;
+
+        case 'resume':
+          // Add resume logic here
+          await telegramService.sendCommandResponse(chatId, '▶️ Trading resumed (not implemented yet)');
+          break;
+
+        case 'stats':
+          // Add stats logic here
+          await telegramService.sendCommandResponse(chatId, '📊 Statistics (not implemented yet)');
+          break;
+
+        default:
+          await telegramService.sendCommandResponse(chatId, '❌ Unknown command');
+      }
+    } catch (error: any) {
+      logErrorWithTimestamp('Telegram command error:', error);
+      await telegramService.sendCommandResponse(chatId, `❌ Error: ${error.message}`);
     }
   }
 
@@ -611,6 +792,16 @@ logWithTimestamp('✅ Price service stopped');
 
       cleanupScheduler.stop();
 logWithTimestamp('✅ Cleanup scheduler stopped');
+
+      if (copyTradingService.isEnabled()) {
+        await copyTradingService.stop();
+logWithTimestamp('✅ Copy Trading service stopped');
+      }
+
+      if (telegramService.isEnabled()) {
+        await telegramService.stop();
+logWithTimestamp('✅ Telegram Bot service stopped');
+      }
 
       configManager.stop();
 logWithTimestamp('✅ Config manager stopped');

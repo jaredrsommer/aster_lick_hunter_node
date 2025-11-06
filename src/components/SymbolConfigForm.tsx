@@ -1093,6 +1093,60 @@ export default function SymbolConfigForm({ onSave, currentConfig }: SymbolConfig
                         </div>
 
                         <div className="space-y-2">
+                          <Label>Max Positions Per Pair</Label>
+                          <Input
+                            type="number"
+                            value={config.symbols[selectedSymbol].maxPositionsPerPair || ''}
+                            placeholder="Unlimited"
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              handleSymbolChange(selectedSymbol, 'maxPositionsPerPair', isNaN(value) || value === 0 ? undefined : value);
+                            }}
+                            min="1"
+                            max="20"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Max simultaneous positions for this symbol (leave empty for unlimited)
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Max Long Positions</Label>
+                          <Input
+                            type="number"
+                            value={config.symbols[selectedSymbol].maxLongPositions || ''}
+                            placeholder="Use general limit"
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              handleSymbolChange(selectedSymbol, 'maxLongPositions', isNaN(value) || value === 0 ? undefined : value);
+                            }}
+                            min="1"
+                            max="20"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Max long positions (overrides general limit)
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Max Short Positions</Label>
+                          <Input
+                            type="number"
+                            value={config.symbols[selectedSymbol].maxShortPositions || ''}
+                            placeholder="Use general limit"
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              handleSymbolChange(selectedSymbol, 'maxShortPositions', isNaN(value) || value === 0 ? undefined : value);
+                            }}
+                            min="1"
+                            max="20"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Max short positions (overrides general limit)
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
                           <Label>Stop Loss (%)</Label>
                           <Input
                             type="number"

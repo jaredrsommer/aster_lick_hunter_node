@@ -30,6 +30,11 @@ export const symbolConfigSchema = z.object({
 
   // Threshold system settings
   useThreshold: z.boolean().optional(),
+
+  // Position limit settings (per symbol)
+  maxPositionsPerPair: z.number().min(1).max(20).optional(), // Default: unlimited
+  maxLongPositions: z.number().min(1).max(20).optional(), // Override for longs
+  maxShortPositions: z.number().min(1).max(20).optional(), // Override for shorts
 }).refine(data => {
   // Ensure we have either legacy or new volume thresholds
   return data.volumeThresholdUSDT !== undefined ||
@@ -64,6 +69,31 @@ export const rateLimitConfigSchema = z.object({
   maxConcurrentRequests: z.number().min(1).max(10).optional(),
 }).optional();
 
+export const copyTradingConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  syncTPSL: z.boolean().default(true), // Auto-sync TP/SL changes from master
+  syncClose: z.boolean().default(true), // Auto-close when master closes
+  delayMs: z.number().default(0), // Optional delay between master and follower trades
+}).optional();
+
+export const telegramNotificationsSchema = z.object({
+  positionOpened: z.boolean().default(true),
+  positionClosed: z.boolean().default(true),
+  stopLossHit: z.boolean().default(true),
+  takeProfitHit: z.boolean().default(true),
+  tradeBlocked: z.boolean().default(true),
+  errors: z.boolean().default(true),
+  lowBalance: z.boolean().default(true),
+  lowBalanceThreshold: z.number().default(100), // USDT
+}).optional();
+
+export const telegramConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  botToken: z.string().optional(),
+  chatId: z.string().optional(),
+  notifications: telegramNotificationsSchema,
+}).optional();
+
 export const globalConfigSchema = z.object({
   riskPercent: z.number().min(0).max(100),
   paperMode: z.boolean(),
@@ -72,6 +102,8 @@ export const globalConfigSchema = z.object({
   useThresholdSystem: z.boolean().optional(),
   server: serverConfigSchema,
   rateLimit: rateLimitConfigSchema,
+  copyTrading: copyTradingConfigSchema,
+  telegram: telegramConfigSchema,
 });
 
 export const configSchema = z.object({
