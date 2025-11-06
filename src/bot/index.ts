@@ -17,6 +17,7 @@ import { getRateLimitManager } from '../lib/api/rateLimitManager';
 import { startRateLimitLogging } from '../lib/api/rateLimitMonitor';
 import { initializeRateLimitToasts } from '../lib/api/rateLimitToasts';
 import { thresholdMonitor } from '../lib/services/thresholdMonitor';
+import { copyTradingService } from '../lib/services/copyTradingService';
 import { logWithTimestamp, logErrorWithTimestamp, logWarnWithTimestamp } from '../lib/utils/timestamp';
 
 // Helper function to kill all child processes (synchronous for exit handler)
@@ -372,6 +373,41 @@ logErrorWithTimestamp('⚠️  Position Manager failed to start:', error.message
         }
       }
 
+      // Initialize Copy Trading Service
+      if (this.config.global.copyTrading?.enabled && hasValidApiKeys) {
+        try {
+          await copyTradingService.initialize({
+            enabled: true,
+            syncTPSL: this.config.global.copyTrading.syncTPSL ?? true,
+            syncClose: this.config.global.copyTrading.syncClose ?? true,
+            delayMs: this.config.global.copyTrading.delayMs ?? 0,
+          });
+
+          // Connect copy trading service to status broadcaster for UI updates
+          copyTradingService.on('copyTradeCompleted', (data: any) => {
+            logWithTimestamp(`Copy Trading: ${data.successful}/${data.totalFollowers} followers synced for ${data.symbol}`);
+            this.statusBroadcaster.broadcast('copy_trade_completed', data);
+          });
+
+          copyTradingService.on('followerPositionOpened', (data: any) => {
+            logWithTimestamp(`Copy Trading: ${data.walletName} - Position opened for ${data.symbol}`);
+            this.statusBroadcaster.broadcast('follower_position_opened', data);
+          });
+
+          copyTradingService.on('followerPositionClosed', (data: any) => {
+            logWithTimestamp(`Copy Trading: ${data.walletName} - Position closed, PnL: ${data.pnl.toFixed(2)} USDT`);
+            this.statusBroadcaster.broadcast('follower_position_closed', data);
+          });
+
+logWithTimestamp('✅ Copy Trading Service initialized');
+        } catch (error: any) {
+logErrorWithTimestamp('⚠️  Copy Trading Service failed to initialize:', error.message);
+          this.statusBroadcaster.addError(`Copy Trading: ${error.message}`);
+        }
+      } else if (this.config.global.copyTrading?.enabled && !hasValidApiKeys) {
+logWarnWithTimestamp('⚠️  Copy Trading is enabled but no API keys configured - Copy Trading will not function');
+      }
+
       // Initialize Hunter
       this.hunter = new Hunter(this.config, this.isHedgeMode);
 
@@ -442,6 +478,21 @@ logWithTimestamp(`📊 Added price streaming for new position: ${data.symbol}`);
               totalPnL: currentBalance.totalPnL,
             });
           }, 1000);
+        }
+
+        // Trigger copy trading if enabled
+        if (copyTradingService.isEnabled() && data.orderId) {
+          copyTradingService.onMasterPositionOpened({
+            orderId: data.orderId,
+            symbol: data.symbol,
+            side: data.side,
+            positionSide: data.positionSide || (data.side === 'BUY' ? 'LONG' : 'SHORT'),
+            quantity: data.quantity,
+            price: data.price,
+            leverage: data.leverage || 1
+          }).catch(error => {
+            logErrorWithTimestamp('Copy Trading: Error copying position:', error);
+          });
         }
       });
 
@@ -611,6 +662,11 @@ logWithTimestamp('✅ Price service stopped');
 
       cleanupScheduler.stop();
 logWithTimestamp('✅ Cleanup scheduler stopped');
+
+      if (copyTradingService.isEnabled()) {
+        await copyTradingService.stop();
+logWithTimestamp('✅ Copy Trading service stopped');
+      }
 
       configManager.stop();
 logWithTimestamp('✅ Config manager stopped');
