@@ -43,14 +43,20 @@ export default function OptimizerPage() {
     setIsStarting(true);
 
     try {
+      // Normalize weights to sum to 100%
+      const total = pnlWeight + sharpeWeight + drawdownWeight;
+      const normalizedPnl = (pnlWeight / total) * 100;
+      const normalizedSharpe = (sharpeWeight / total) * 100;
+      const normalizedDrawdown = (drawdownWeight / total) * 100;
+
       const response = await fetch('/api/optimizer/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           weights: {
-            pnl: pnlWeight,
-            sharpe: sharpeWeight,
-            drawdown: drawdownWeight,
+            pnl: normalizedPnl,
+            sharpe: normalizedSharpe,
+            drawdown: normalizedDrawdown,
           },
           symbols: selectedSymbols,
         }),

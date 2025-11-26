@@ -20,6 +20,7 @@ import PerformanceCardInline from '@/components/PerformanceCardInline';
 import SessionPerformanceCard from '@/components/SessionPerformanceCard';
 import RecentOrdersTable from '@/components/RecentOrdersTable';
 import { TradeSizeWarningModal } from '@/components/TradeSizeWarningModal';
+import SymbolTicker from '@/components/SymbolTicker';
 import { useConfig } from '@/components/ConfigProvider';
 import websocketService from '@/lib/services/websocketService';
 import { useOrderNotifications } from '@/hooks/useOrderNotifications';
@@ -111,14 +112,38 @@ export default function DashboardPage() {
 
     const cleanupMessageHandler = websocketService.addMessageHandler(handleWebSocketMessage);
 
+    // Set up periodic polling as fallback (every 30 seconds)
+    // This ensures UI updates even if WebSocket connection drops
+    const pollingInterval = setInterval(async () => {
+      try {
+        // Only force refresh if data is stale (>30 seconds old)
+        const now = Date.now();
+        const balanceAge = now - (balanceStatus.timestamp || 0);
+
+        if (balanceAge > 30000) {
+          console.log('[Dashboard] Data stale, polling for updates...');
+          const [balanceData, positionsData] = await Promise.all([
+            dataStore.fetchBalance(true),
+            dataStore.fetchPositions(true)
+          ]);
+          setAccountInfo(balanceData);
+          setPositions(positionsData);
+          setBalanceStatus({ source: 'polling', timestamp: now });
+        }
+      } catch (error) {
+        console.error('[Dashboard] Polling failed:', error);
+      }
+    }, 30000);
+
     // Cleanup on unmount
     return () => {
       dataStore.off('balance:update', handleBalanceUpdate);
       dataStore.off('positions:update', handlePositionsUpdate);
       dataStore.off('markPrices:update', handleMarkPricesUpdate);
       cleanupMessageHandler();
+      clearInterval(pollingInterval);
     };
-  }, []); // No dependencies - only run once on mount
+  }, [balanceStatus.timestamp]); // Re-run when balance timestamp changes
 
   // Refresh data manually if needed
   const _refreshData = async () => {
@@ -161,6 +186,16 @@ export default function DashboardPage() {
   // Calculate live account info with real-time mark prices
   // This supplements the official balance data with live price updates
   const liveAccountInfo = useMemo(() => {
+    // Ensure we have valid account info first
+    if (!accountInfo || typeof accountInfo.totalBalance !== 'number') {
+      return {
+        totalBalance: 0,
+        availableBalance: 0,
+        totalPositionValue: 0,
+        totalPnL: 0,
+      };
+    }
+
     if (positions.length === 0) {
       return accountInfo;
     }
@@ -171,21 +206,30 @@ export default function DashboardPage() {
 
     positions.forEach(position => {
       const liveMarkPrice = markPrices[position.symbol];
-      if (liveMarkPrice && liveMarkPrice !== position.markPrice) {
+      if (liveMarkPrice && liveMarkPrice !== position.markPrice && !isNaN(liveMarkPrice)) {
         hasLivePrices = true;
-        const entryPrice = position.entryPrice;
-        const quantity = position.quantity;
+        const entryPrice = position.entryPrice || 0;
+        const quantity = position.quantity || 0;
         const isLong = position.side === 'LONG';
 
         // Calculate live PnL for this position
         const priceDiff = liveMarkPrice - entryPrice;
         const positionPnL = isLong ? priceDiff * quantity : -priceDiff * quantity;
-        liveTotalPnL += positionPnL;
+
+        if (!isNaN(positionPnL)) {
+          liveTotalPnL += positionPnL;
+        }
       } else {
         // Use the position's current PnL if no live price available
-        liveTotalPnL += position.pnl || 0;
+        const pnl = position.pnl || 0;
+        if (!isNaN(pnl)) {
+          liveTotalPnL += pnl;
+        }
       }
     });
+
+    // Ensure no NaN values
+    liveTotalPnL = isNaN(liveTotalPnL) ? 0 : liveTotalPnL;
 
     // If we have live prices, update the PnL only
     // Total balance should remain consistent (available + margin)
@@ -194,12 +238,19 @@ export default function DashboardPage() {
         ...accountInfo,
         totalPnL: liveTotalPnL,
         // Don't recalculate total balance - it's already correct
-        totalBalance: accountInfo.totalBalance
+        totalBalance: accountInfo.totalBalance || 0,
+        availableBalance: accountInfo.availableBalance || 0,
+        totalPositionValue: accountInfo.totalPositionValue || 0,
       };
     }
 
-    // Otherwise return official balance data
-    return accountInfo;
+    // Otherwise return official balance data with NaN protection
+    return {
+      totalBalance: accountInfo.totalBalance || 0,
+      availableBalance: accountInfo.availableBalance || 0,
+      totalPositionValue: accountInfo.totalPositionValue || 0,
+      totalPnL: accountInfo.totalPnL || 0,
+    };
   }, [accountInfo, positions, markPrices]);
 
   const handleClosePosition = async (_symbol: string, _side: 'LONG' | 'SHORT') => {
@@ -355,37 +406,15 @@ export default function DashboardPage() {
             {/* Live Session Performance */}
             <SessionPerformanceCard />
 
-            <div className="w-px h-8 bg-border" />
-
-            {/* Active Trading Symbols */}
-            <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-muted-foreground" />
-              <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Active Symbols</span>
-                <div className="flex items-center gap-1">
-                  {config?.symbols && Object.keys(config.symbols).length > 0 ? (
-                    <>
-                      <span className="text-lg font-semibold">{Object.keys(config.symbols).length}</span>
-                      <div className="flex gap-1 max-w-[200px] overflow-hidden">
-                        {Object.keys(config.symbols).slice(0, 3).map((symbol, _index) => (
-                          <Badge key={symbol} variant="outline" className="h-4 text-[10px] px-1">
-                            {symbol.replace('USDT', '')}
-                          </Badge>
-                        ))}
-                        {Object.keys(config.symbols).length > 3 && (
-                          <Badge variant="outline" className="h-4 text-[10px] px-1">
-                            +{Object.keys(config.symbols).length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <span className="text-lg font-semibold text-muted-foreground">0</span>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
+
+          {/* Scrolling Symbol Ticker */}
+          {config?.symbols && Object.keys(config.symbols).length > 0 && (
+            <SymbolTicker
+              symbols={Object.keys(config.symbols)}
+              markPrices={markPrices}
+            />
+          )}
 
           {/* PnL Chart */}
           <PnLChart />

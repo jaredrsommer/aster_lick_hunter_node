@@ -244,25 +244,76 @@ class DataStore extends EventEmitter {
       this.updateBalance(message.data, 'websocket');
     } else if (message.type === 'position_update') {
       console.log('[DataStore] Position update received:', message.data?.type);
-      // Clear positions cache immediately to prevent serving stale data
-      this.state.positions.timestamp = 0;
 
-      // Check if this is a position closure
-      if (message.data?.type === 'closed') {
-        console.log('[DataStore] Position closed, fetching positions immediately');
-        // Fetch immediately for position closures
-        this.fetchPositions(true).catch(error => {
-          console.error('[DataStore] Failed to fetch positions after closure:', error);
-        });
+      // If the message contains full position data (from paper mode), use it directly
+      if (message.data?.entryPrice !== undefined && message.data?.markPrice !== undefined) {
+        console.log('[DataStore] Using full position data from WebSocket (paper mode)');
+
+        // Clear positions cache
+        this.state.positions.timestamp = 0;
+
+        // Find or create position in current list
+        const positionData = message.data;
+        const existingPositions = [...this.state.positions.data];
+        const positionIndex = existingPositions.findIndex(
+          p => p.symbol === positionData.symbol && p.side === positionData.side
+        );
+
+        if (positionData.type === 'closed') {
+          // Remove closed position
+          if (positionIndex >= 0) {
+            existingPositions.splice(positionIndex, 1);
+          }
+        } else {
+          // Update or add position
+          const position: Position = {
+            symbol: positionData.symbol,
+            side: positionData.side,
+            quantity: positionData.quantity,
+            entryPrice: positionData.entryPrice,
+            markPrice: positionData.markPrice,
+            pnl: positionData.pnl || 0,
+            pnlPercent: positionData.pnlPercent || 0,
+            margin: positionData.margin || 0,
+            leverage: positionData.leverage || 1,
+            liquidationPrice: positionData.liquidationPrice,
+            hasStopLoss: positionData.hasStopLoss || false,
+            hasTakeProfit: positionData.hasTakeProfit || false,
+          };
+
+          if (positionIndex >= 0) {
+            existingPositions[positionIndex] = position;
+          } else {
+            existingPositions.push(position);
+          }
+        }
+
+        // Update state and emit
+        this.state.positions.data = existingPositions;
+        this.state.positions.timestamp = Date.now();
+        this.emit('positions:update', existingPositions);
       } else {
-        // Add a 1 second delay to allow protective orders to be placed
-        // This ensures SL/TP badges appear correctly in the dashboard
-        setTimeout(() => {
-          // Force fetch to get latest positions with protective orders
+        // Original behavior: fetch from API for real positions
+        // Clear positions cache immediately to prevent serving stale data
+        this.state.positions.timestamp = 0;
+
+        // Check if this is a position closure
+        if (message.data?.type === 'closed') {
+          console.log('[DataStore] Position closed, fetching positions immediately');
+          // Fetch immediately for position closures
           this.fetchPositions(true).catch(error => {
-            console.error('[DataStore] Failed to fetch positions after update:', error);
+            console.error('[DataStore] Failed to fetch positions after closure:', error);
           });
-        }, 1000);
+        } else {
+          // Add a 1 second delay to allow protective orders to be placed
+          // This ensures SL/TP badges appear correctly in the dashboard
+          setTimeout(() => {
+            // Force fetch to get latest positions with protective orders
+            this.fetchPositions(true).catch(error => {
+              console.error('[DataStore] Failed to fetch positions after update:', error);
+            });
+          }, 1000);
+        }
       }
     } else if (message.type === 'position_closed') {
       console.log('[DataStore] Position closed event received, fetching positions immediately');

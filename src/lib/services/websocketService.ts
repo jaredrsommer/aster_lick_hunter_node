@@ -24,8 +24,8 @@ class WebSocketService {
     } else if (typeof window !== 'undefined') {
       const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
       const wsHost = window.location.hostname;
-      // Use port 8080 as default, will be updated by WebSocketProvider
-      this.url = `${wsProtocol}://${wsHost}:8080`;
+      // Use port 10001 as default, will be updated by WebSocketProvider
+      this.url = `${wsProtocol}://${wsHost}:10001`;
       console.log('WebSocketService: Initialized with default URL from window location:', this.url);
     } else {
       // Don't set a default URL during SSR - it will be set by WebSocketProvider

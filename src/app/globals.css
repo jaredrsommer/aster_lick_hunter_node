@@ -143,6 +143,24 @@
   .animate-shimmer {
     animation: shimmer 2s infinite;
   }
+
+  /* Stock ticker animation */
+  @keyframes ticker {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-ticker {
+    animation: ticker 30s linear infinite;
+  }
+
+  .group:hover .animate-ticker {
+    animation-play-state: paused;
+  }
 }
 
 /* Enhanced GSAP toast animations */

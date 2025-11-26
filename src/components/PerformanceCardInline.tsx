@@ -63,6 +63,13 @@ export default function PerformanceCardInline() {
     };
 
     fetchData();
+
+    // Poll every 60 seconds for updated performance data
+    const pollingInterval = setInterval(() => {
+      fetchData();
+    }, 60000);
+
+    return () => clearInterval(pollingInterval);
   }, []);
 
   useEffect(() => {

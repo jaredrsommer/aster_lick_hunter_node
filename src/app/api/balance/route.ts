@@ -37,6 +37,62 @@ export const GET = withAuth(async (request: NextRequest, _user) => {
   try {
     const config = await loadConfig();
 
+    // If in paper mode, calculate balance from paper trades
+    if (config.global.paperMode) {
+      try {
+        const { paperTradeDb } = await import('@/lib/db/paperTradeDb');
+        const { db } = await import('@/lib/db/database');
+
+        // Get starting balance and realized P&L from balance state
+        let startingBalance = 10000;
+        let realizedPnL = 0;
+
+        try {
+          const balanceState = await db.get<{
+            starting_balance: number;
+            realized_pnl: number;
+          }>('SELECT * FROM paper_balance_state WHERE id = 1');
+
+          if (balanceState) {
+            startingBalance = balanceState.starting_balance;
+            realizedPnL = balanceState.realized_pnl;
+          }
+        } catch (err) {
+          // Table might not exist yet
+        }
+
+        // Get open trades to calculate used margin and unrealized P&L
+        const openTrades = await paperTradeDb.getTrades({ status: 'open' });
+
+        let usedMargin = 0;
+        let unrealizedPnL = 0;
+
+        for (const trade of openTrades) {
+          usedMargin += trade.margin;
+          unrealizedPnL += trade.pnl || 0;
+        }
+
+        // Total balance = starting balance + realized P&L
+        const totalBalance = startingBalance + realizedPnL;
+
+        // Available balance = total balance - used margin
+        const availableBalance = totalBalance - usedMargin;
+
+        return NextResponse.json({
+          totalBalance,
+          availableBalance,
+          totalPositionValue: usedMargin,
+          totalPnL: unrealizedPnL,
+          source: 'paper',
+          timestamp: Date.now(),
+          responseTime: Date.now() - startTime,
+        });
+      } catch (error: any) {
+        console.error('[Balance API] Error calculating paper balance:', error);
+        // Fall through to mock data
+      }
+    }
+
     // If no API key is configured, return mock data
     if (!config.api.apiKey || !config.api.secretKey) {
       return NextResponse.json({

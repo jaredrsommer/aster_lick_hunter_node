@@ -10,9 +10,9 @@ interface WebSocketContextType {
 }
 
 const WebSocketContext = createContext<WebSocketContextType>({
-  wsPort: 8080,
+  wsPort: 10001,
   wsHost: typeof window !== 'undefined' ? window.location.hostname : 'localhost',
-  wsUrl: typeof window !== 'undefined' ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:8080` : 'ws://localhost:8080'
+  wsUrl: typeof window !== 'undefined' ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:10001` : 'ws://localhost:10001'
 });
 
 export const useWebSocketConfig = () => {
@@ -24,7 +24,7 @@ export const useWebSocketConfig = () => {
 };
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const [wsPort, setWsPort] = useState(8080);
+  const [wsPort, setWsPort] = useState(10001);
   const [wsHost, setWsHost] = useState('localhost');
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       .then(res => res.json())
       .then(data => {
         // Fix: API returns config directly, not nested under config property
-        const port = data.global?.server?.websocketPort || 8080;
+        const port = data.global?.server?.websocketPort || 10001;
         const useRemoteWebSocket = data.global?.server?.useRemoteWebSocket || false;
         const configHost = data.global?.server?.websocketHost;
         const envHost = data.global?.server?.envWebSocketHost;
@@ -105,9 +105,9 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
           fallbackHost = window.location.hostname;
           fallbackProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         }
-        
+
         setWsHost(fallbackHost);
-        const fallbackUrl = `${fallbackProtocol}://${fallbackHost}:8080`;
+        const fallbackUrl = `${fallbackProtocol}://${fallbackHost}:10001`;
         console.log('WebSocketProvider: Using fallback WebSocket URL:', fallbackUrl);
         websocketService.setUrl(fallbackUrl);
 

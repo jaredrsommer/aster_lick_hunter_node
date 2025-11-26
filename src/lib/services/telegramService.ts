@@ -386,6 +386,29 @@ Please add funds to continue trading.
   setChatId(chatId: string): void {
     this.chatId = chatId;
   }
+
+  updateConfig(newConfig: TelegramConfig): void {
+    const wasEnabled = this.enabled;
+    this.config = newConfig;
+    this.enabled = newConfig.enabled && !!newConfig.botToken && !!newConfig.chatId;
+
+    // If Telegram was disabled and now enabled, initialize
+    if (!wasEnabled && this.enabled) {
+      console.log('[Telegram] Config updated: Initializing bot...');
+      this.initialize(newConfig).catch(error => {
+        console.error('[Telegram] Failed to initialize after config update:', error);
+      });
+    }
+    // If Telegram was enabled and now disabled, stop
+    else if (wasEnabled && !this.enabled) {
+      console.log('[Telegram] Config updated: Stopping bot...');
+      this.stop();
+    }
+    // If still enabled but config changed, just update the internal config
+    else if (this.enabled) {
+      console.log('[Telegram] Config updated: Notification settings refreshed');
+    }
+  }
 }
 
 export const telegramService = new TelegramService();

@@ -58,6 +58,31 @@ export interface RateLimitConfig {
   maxConcurrentRequests?: number; // Maximum number of concurrent requests (default: 3)
 }
 
+export interface TelegramNotifications {
+  positionOpened?: boolean;
+  positionClosed?: boolean;
+  stopLossHit?: boolean;
+  takeProfitHit?: boolean;
+  tradeBlocked?: boolean;
+  errors?: boolean;
+  lowBalance?: boolean;
+  lowBalanceThreshold?: number; // USDT
+}
+
+export interface TelegramConfig {
+  enabled: boolean;
+  botToken?: string;
+  chatId?: string;
+  notifications?: TelegramNotifications;
+}
+
+export interface CopyTradingConfig {
+  enabled: boolean;
+  syncTPSL?: boolean; // Auto-sync TP/SL changes from master
+  syncClose?: boolean; // Auto-close when master closes
+  delayMs?: number; // Optional delay between master and follower trades
+}
+
 export interface GlobalConfig {
   riskPercent: number;     // Max risk per trade as % of account balance
   paperMode: boolean;      // If true, simulate trades without executing
@@ -66,6 +91,8 @@ export interface GlobalConfig {
   useThresholdSystem?: boolean; // Enable 60-second rolling volume threshold system (default: false)
   server?: ServerConfig;    // Optional server configuration
   rateLimit?: RateLimitConfig; // Rate limit configuration
+  telegram?: TelegramConfig; // Telegram notifications configuration
+  copyTrading?: CopyTradingConfig; // Copy trading configuration
 }
 
 export interface Config {

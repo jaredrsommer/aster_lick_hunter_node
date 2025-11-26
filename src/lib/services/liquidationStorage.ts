@@ -126,16 +126,16 @@ export class LiquidationStorage {
   }
 
   async cleanupOldLiquidations(): Promise<number> {
-    const sevenDaysAgo = Math.floor(Date.now() / 1000) - (7 * 24 * 60 * 60);
+    const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
 
     const countSql = 'SELECT COUNT(*) as count FROM liquidations WHERE created_at < ?';
-    const countResult = await db.get<{ count: number }>(countSql, [sevenDaysAgo]);
+    const countResult = await db.get<{ count: number }>(countSql, [thirtyDaysAgo]);
     const deletedCount = countResult?.count || 0;
 
     const sql = 'DELETE FROM liquidations WHERE created_at < ?';
-    await db.run(sql, [sevenDaysAgo]);
+    await db.run(sql, [thirtyDaysAgo]);
 
-    console.log(`Cleaned up ${deletedCount} liquidations older than 7 days`);
+    console.log(`Cleaned up ${deletedCount} liquidations older than 30 days`);
     return deletedCount;
   }
 

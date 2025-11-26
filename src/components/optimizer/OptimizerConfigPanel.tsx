@@ -63,6 +63,9 @@ export function OptimizerConfigPanel({
     onStartOptimization(selectedSymbols);
   };
 
+  const total = pnlWeight + sharpeWeight + drawdownWeight;
+  const needsNormalization = Math.abs(total - 100) > 0.1;
+
   return (
     <div className="space-y-6">
       {/* Weight Sliders */}
@@ -147,6 +150,16 @@ export function OptimizerConfigPanel({
           </ul>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Normalization Warning */}
+      {needsNormalization && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950/30">
+          <p className="text-xs text-yellow-900 dark:text-yellow-200">
+            ⚠️ <strong>Weights will be auto-normalized:</strong> Current total is {total.toFixed(1)}%.
+            Weights will be adjusted proportionally to sum to 100% before optimization starts.
+          </p>
+        </div>
+      )}
 
       {/* Start Button */}
       <div className="flex items-center gap-3 pt-2">

@@ -110,6 +110,47 @@ export class Database {
 
       CREATE INDEX IF NOT EXISTS idx_follower_positions_master_order
         ON follower_positions(master_order_id);
+
+      CREATE TABLE IF NOT EXISTS paper_trades (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        symbol TEXT NOT NULL,
+        side TEXT NOT NULL,
+        position_side TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        entry_price REAL NOT NULL,
+        exit_price REAL,
+        leverage INTEGER NOT NULL,
+        margin REAL NOT NULL,
+        status TEXT DEFAULT 'open',
+        opened_at INTEGER NOT NULL,
+        closed_at INTEGER,
+        close_reason TEXT,
+        pnl REAL,
+        pnl_percent REAL,
+        duration_seconds INTEGER,
+        max_pnl REAL DEFAULT 0,
+        min_pnl REAL DEFAULT 0,
+        metadata TEXT
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_paper_trades_symbol
+        ON paper_trades(symbol);
+
+      CREATE INDEX IF NOT EXISTS idx_paper_trades_status
+        ON paper_trades(status);
+
+      CREATE INDEX IF NOT EXISTS idx_paper_trades_opened_at
+        ON paper_trades(opened_at);
+
+      CREATE INDEX IF NOT EXISTS idx_paper_trades_closed_at
+        ON paper_trades(closed_at);
+
+      CREATE TABLE IF NOT EXISTS paper_balance_state (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        starting_balance REAL NOT NULL DEFAULT 10000,
+        realized_pnl REAL NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL
+      );
     `;
 
     this.db.exec(schema, (err) => {

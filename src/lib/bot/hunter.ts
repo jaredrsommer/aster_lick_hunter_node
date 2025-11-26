@@ -845,11 +845,27 @@ logWarnWithTimestamp(`Hunter: Proceeding with trade anyway - exchange will rejec
       }
 
       if (this.config.global.paperMode) {
-logWithTimestamp(`Hunter: PAPER MODE - Would place ${side} order for ${symbol}, quantity: ${symbolConfig.tradeSize}, leverage: ${symbolConfig.leverage}`);
+        // Calculate proper quantity for paper mode based on trade size (margin) and leverage
+        const marginUSDT = side === 'BUY'
+          ? (symbolConfig.longTradeSize ?? symbolConfig.tradeSize)
+          : (symbolConfig.shortTradeSize ?? symbolConfig.tradeSize);
+
+        const notionalUSDT = marginUSDT * symbolConfig.leverage;
+        const calculatedQuantity = notionalUSDT / entryPrice;
+
+        // Format quantity using symbol precision (use default if not available)
+        const quantity = symbolPrecision.formatQuantity(symbol, calculatedQuantity);
+
+logWithTimestamp(`Hunter: PAPER MODE - Would place ${side} order for ${symbol}`);
+logWithTimestamp(`  Margin: ${marginUSDT} USDT, Leverage: ${symbolConfig.leverage}x`);
+logWithTimestamp(`  Notional: ${notionalUSDT.toFixed(2)} USDT, Price: ${entryPrice.toFixed(4)}`);
+logWithTimestamp(`  Calculated quantity: ${calculatedQuantity.toFixed(8)} -> ${quantity} (formatted)`);
+
         this.emit('positionOpened', {
           symbol,
           side,
-          quantity: symbolConfig.tradeSize,
+          quantity: quantity,  // Properly calculated quantity in contracts
+          margin: marginUSDT,  // Margin in USDT
           price: entryPrice,
           leverage: symbolConfig.leverage,
           paperMode: true

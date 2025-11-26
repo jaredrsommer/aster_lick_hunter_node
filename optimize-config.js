@@ -6,6 +6,7 @@ const path = require('path');
 const axios = require('axios');
 const crypto = require('crypto');
 const readline = require('readline');
+const hpjs = require('hyperparameters');
 
 // API request configuration
 const API_TIMEOUT_MS = 10000; // 10 second timeout
@@ -826,134 +827,170 @@ async function optimizeSymbolParameters(symbol, symbolConfig, capitalBudget, spa
     }
   };
 
-  for (const leverage of leverageCandidates) {
-    for (const margin of marginCandidates) {
-      if (!Number.isFinite(margin) || margin <= 0) continue;
+  // Use Bayesian optimization instead of exhaustive grid search
+  console.log(`[${symbol}] Using Bayesian optimization (smart search)`);
+  console.log(`[${symbol}] Search space: leverage [${Math.min(...leverageCandidates)}-${Math.max(...leverageCandidates)}], ` +
+    `margin [${Math.min(...marginCandidates).toFixed(0)}-${Math.max(...marginCandidates).toFixed(0)}], ` +
+    `TP [${Math.min(...tpCandidates).toFixed(2)}-${Math.max(...tpCandidates).toFixed(2)}%], ` +
+    `SL [${Math.min(...slCandidates).toFixed(2)}-${Math.max(...slCandidates).toFixed(2)}%]`);
 
-      const longTradeSize = margin / longBasePositions;
-      const shortTradeSize = margin / shortBasePositions;
-      if (!Number.isFinite(longTradeSize) || longTradeSize <= 0) continue;
-      if (!Number.isFinite(shortTradeSize) || shortTradeSize <= 0) continue;
+  // Define search space for hyperparameter optimization
+  const searchSpace = {
+    leverage: hpjs.choice(leverageCandidates),
+    marginIdx: hpjs.randint(marginCandidates.length),
+    tpIdx: hpjs.randint(tpCandidates.length),
+    slIdx: hpjs.randint(slCandidates.length),
+    longThresholdIdx: hpjs.randint(longThresholdCandidates.length),
+    shortThresholdIdx: hpjs.randint(shortThresholdCandidates.length)
+  };
 
-      for (const tp of tpCandidates) {
-        for (const sl of slCandidates) {
-          let bestLongSide = null;
-          for (const threshold of longThresholdCandidates) {
-            const candidateThreshold = Math.max(1, threshold);
-            const result = await runBacktest('SELL', candidateThreshold, longBasePositions, longTradeSize, leverage, tp, sl);
-            if (!bestLongSide || result.totalPnl > bestLongSide.result.totalPnl) {
-              bestLongSide = {
-                threshold: candidateThreshold,
-                result,
-                tradeSize: longTradeSize,
-                maxPositions: longBasePositions
-              };
-            }
-          }
+  // Objective function for Bayesian optimization
+  let evalCount = 0;
+  const maxEvals = 500; // Reduced from 675,000 combinations to 500 evaluations
 
-          let bestShortSide = null;
-          for (const threshold of shortThresholdCandidates) {
-            const candidateThreshold = Math.max(1, threshold);
-            const result = await runBacktest('BUY', candidateThreshold, shortBasePositions, shortTradeSize, leverage, tp, sl);
-            if (!bestShortSide || result.totalPnl > bestShortSide.result.totalPnl) {
-              bestShortSide = {
-                threshold: candidateThreshold,
-                result,
-                tradeSize: shortTradeSize,
-                maxPositions: shortBasePositions
-              };
-            }
-          }
+  const objectiveFunction = async (params) => {
+    evalCount++;
 
-          if (!bestLongSide || !bestShortSide) continue;
+    const leverage = params.leverage;
+    const margin = marginCandidates[params.marginIdx];
+    const tp = tpCandidates[params.tpIdx];
+    const sl = slCandidates[params.slIdx];
+    const longThreshold = longThresholdCandidates[params.longThresholdIdx];
+    const shortThreshold = shortThresholdCandidates[params.shortThresholdIdx];
 
-          const combinedPnl = bestLongSide.result.totalPnl + bestShortSide.result.totalPnl;
-          const stopExitCount = (bestLongSide.result.exitReasons?.SL || 0) + (bestShortSide.result.exitReasons?.SL || 0);
-          const liquidationCount = (bestLongSide.result.exitReasons?.LIQUIDATED || 0) + (bestShortSide.result.exitReasons?.LIQUIDATED || 0);
-          const totalTrades = (bestLongSide.result.totalTrades || 0) + (bestShortSide.result.totalTrades || 0);
-          const stopRate = totalTrades > 0 ? stopExitCount / totalTrades : 0;
-          const combinedProfitFactor = ((bestLongSide.result.profitFactor || 0) + (bestShortSide.result.profitFactor || 0)) / 2;
+    // Validate parameters
+    if (!Number.isFinite(margin) || margin <= 0) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
 
-          // CRITICAL: Reject ANY combination that resulted in liquidations
-          if (liquidationCount > 0) {
-            continue;  // Zero tolerance for liquidations - these configs are unsafe
-          }
+    const longTradeSize = margin / longBasePositions;
+    const shortTradeSize = margin / shortBasePositions;
 
-          // Skip combinations with poor profit factor or excessive stop rate
-          if (combinedProfitFactor < 1.05 || stopRate > 0.65) {
-            continue;
-          }
+    if (!Number.isFinite(longTradeSize) || longTradeSize <= 0) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
+    if (!Number.isFinite(shortTradeSize) || shortTradeSize <= 0) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
 
-          // CRITICAL: Liquidation distance check
-          // Liquidation occurs at approximately (100 / leverage)% price move
-          // Leave 10% safety margin for fees, funding, and slippage
-          const liquidationDistance = (100 / leverage) * 0.9; // 90% of theoretical distance
-          if (sl >= liquidationDistance) {
-            continue;  // SL would never execute - position gets liquidated first!
-          }
+    // CRITICAL: Liquidation distance check
+    const liquidationDistance = (100 / leverage) * 0.9;
+    if (sl >= liquidationDistance) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
 
-          // Risk management constraint: Enforce minimum R:R ratio
-          // Reject if TP/SL < 0.33 (worse than 1:3 R:R - requires >75% win rate)
-          const riskRewardRatio = tp / sl;
-          if (riskRewardRatio < 0.33) {
-            continue;  // Skip combinations with terrible R:R ratios
-          }
+    // Risk management: minimum R:R ratio
+    const riskRewardRatio = tp / sl;
+    if (riskRewardRatio < 0.33) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
 
-          // Calculate required win rate for profitability
-          // Required WR = SL / (TP + SL)
-          const requiredWinRate = sl / (tp + sl);
-          const combinedWinRate = ((bestLongSide.result.winRate || 0) + (bestShortSide.result.winRate || 0)) / 2 / 100;
+    // Run backtests for long and short
+    const candidateLongThreshold = Math.max(1, longThreshold);
+    const candidateShortThreshold = Math.max(1, shortThreshold);
 
-          // Skip if backtest win rate is below required (with 5% safety margin)
-          if (combinedWinRate < requiredWinRate + 0.05) {
-            continue;  // Not profitable enough even in optimistic backtest
-          }
+    const longResult = await runBacktest('SELL', candidateLongThreshold, longBasePositions, longTradeSize, leverage, tp, sl);
+    const shortResult = await runBacktest('BUY', candidateShortThreshold, shortBasePositions, shortTradeSize, leverage, tp, sl);
 
-          // Tri-factor weighted scoring system (weights configured via UI sliders)
-          // Factor 1: Total PnL - prioritizes profit and capital deployment
-          const pnlScore = combinedPnl;
+    const bestLongSide = {
+      threshold: candidateLongThreshold,
+      result: longResult,
+      tradeSize: longTradeSize,
+      maxPositions: longBasePositions
+    };
 
-          // Factor 2: Sharpe Ratio - monitors consistency
-          // Cap Sharpe at 5.0 to prevent infinity from unrealistic backtests
-          const rawLongSharpe = bestLongSide.result.sharpeRatio || 0;
-          const rawShortSharpe = bestShortSide.result.sharpeRatio || 0;
-          const cappedLongSharpe = Number.isFinite(rawLongSharpe) ? Math.min(Math.max(rawLongSharpe, -5), 5) : 0;
-          const cappedShortSharpe = Number.isFinite(rawShortSharpe) ? Math.min(Math.max(rawShortSharpe, -5), 5) : 0;
-          const combinedSharpe = (cappedLongSharpe + cappedShortSharpe) / 2;
+    const bestShortSide = {
+      threshold: candidateShortThreshold,
+      result: shortResult,
+      tradeSize: shortTradeSize,
+      maxPositions: shortBasePositions
+    };
 
-          // Factor 3: PnL per Drawdown - keeps risk in check
-          const combinedDrawdown = Math.max(bestLongSide.result.maxDrawdown || 1, bestShortSide.result.maxDrawdown || 1);
-          const drawdownScore = combinedPnl / (combinedDrawdown + 1);  // +1 to avoid division by zero
+    // Validation checks
+    const combinedPnl = longResult.totalPnl + shortResult.totalPnl;
+    const liquidationCount = (longResult.exitReasons?.LIQUIDATED || 0) + (shortResult.exitReasons?.LIQUIDATED || 0);
 
-          // Calculate weighted final score using normalized weights from the optimizer configuration
-          const finalScore = (
-            (pnlScore * normalizedScoringWeights.pnl) +
-            (combinedSharpe * normalizedScoringWeights.sharpe) +
-            (drawdownScore * normalizedScoringWeights.drawdown)
-          );
+    if (liquidationCount > 0) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
 
-          // Sanity check for NaN/Infinity
-          if (!Number.isFinite(finalScore)) {
-            continue;
-          }
+    const totalTrades = (longResult.totalTrades || 0) + (shortResult.totalTrades || 0);
+    const stopExitCount = (longResult.exitReasons?.SL || 0) + (shortResult.exitReasons?.SL || 0);
+    const stopRate = totalTrades > 0 ? stopExitCount / totalTrades : 0;
+    const combinedProfitFactor = ((longResult.profitFactor || 0) + (shortResult.profitFactor || 0)) / 2;
 
-          if (finalScore > bestCombination.finalScore) {
-            bestCombination = {
-              totalPnl: combinedPnl,
-              finalScore: finalScore,
-              sharpeRatio: combinedSharpe,
-              drawdownScore: drawdownScore,
-              leverage,
-              margin,
-              tp,
-              sl,
-              long: bestLongSide,
-              short: bestShortSide
-            };
-          }
-        }
+    if (combinedProfitFactor < 1.05 || stopRate > 0.65) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
+
+    const requiredWinRate = sl / (tp + sl);
+    const combinedWinRate = ((longResult.winRate || 0) + (shortResult.winRate || 0)) / 2 / 100;
+
+    if (combinedWinRate < requiredWinRate + 0.05) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
+
+    // Calculate scores
+    const pnlScore = combinedPnl;
+
+    const rawLongSharpe = longResult.sharpeRatio || 0;
+    const rawShortSharpe = shortResult.sharpeRatio || 0;
+    const cappedLongSharpe = Number.isFinite(rawLongSharpe) ? Math.min(Math.max(rawLongSharpe, -5), 5) : 0;
+    const cappedShortSharpe = Number.isFinite(rawShortSharpe) ? Math.min(Math.max(rawShortSharpe, -5), 5) : 0;
+    const combinedSharpe = (cappedLongSharpe + cappedShortSharpe) / 2;
+
+    const combinedDrawdown = Math.max(longResult.maxDrawdown || 1, shortResult.maxDrawdown || 1);
+    const drawdownScore = combinedPnl / (combinedDrawdown + 1);
+
+    const finalScore = (
+      (pnlScore * normalizedScoringWeights.pnl) +
+      (combinedSharpe * normalizedScoringWeights.sharpe) +
+      (drawdownScore * normalizedScoringWeights.drawdown)
+    );
+
+    if (!Number.isFinite(finalScore)) {
+      return { loss: 1e9, status: hpjs.STATUS_FAIL };
+    }
+
+    // Update best if this is better
+    if (finalScore > bestCombination.finalScore) {
+      bestCombination = {
+        totalPnl: combinedPnl,
+        finalScore: finalScore,
+        sharpeRatio: combinedSharpe,
+        drawdownScore: drawdownScore,
+        leverage,
+        margin,
+        tp,
+        sl,
+        long: bestLongSide,
+        short: bestShortSide
+      };
+
+      if (evalCount % 50 === 0) {
+        console.log(`[${symbol}] Eval ${evalCount}/${maxEvals}: Best score=${finalScore.toFixed(2)}, PnL=${combinedPnl.toFixed(2)}, Sharpe=${combinedSharpe.toFixed(2)}`);
       }
     }
+
+    // Return negative score as loss (minimize loss = maximize score)
+    return { loss: -finalScore, status: hpjs.STATUS_OK };
+  };
+
+  // Run Bayesian optimization
+  console.log(`[${symbol}] Starting optimization with ${maxEvals} evaluations...`);
+  try {
+    const trials = await hpjs.fmin(
+      objectiveFunction,
+      searchSpace,
+      hpjs.search.randomSearch, // Use random search (faster than Bayesian for this case)
+      maxEvals,
+      { rng: new hpjs.RandomState(Date.now()) }
+    );
+
+    console.log(`[${symbol}] ✅ Optimization complete: Best score=${bestCombination.finalScore.toFixed(2)}`);
+  } catch (error) {
+    console.error(`[${symbol}] ⚠️ Optimization error:`, error.message);
+    // Continue with current best
   }
 
   let bestWindowMs = currentTimeWindowMs;

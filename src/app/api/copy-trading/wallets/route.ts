@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { copyTradingService } from '@/lib/services/copyTradingService';
-import { withAuth } from '@/lib/auth/api-auth';
+import { withAuth } from '@/lib/auth/with-auth';
 
 async function handler(req: NextRequest) {
   if (req.method === 'GET') {

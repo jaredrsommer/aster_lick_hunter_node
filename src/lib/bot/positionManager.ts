@@ -10,13 +10,17 @@ import { symbolPrecision } from '../utils/symbolPrecision';
 import { getBalanceService } from '../services/balanceService';
 import { errorLogger } from '../services/errorLogger';
 import { getPriceService } from '../services/priceService';
+import { getPaperBalanceService } from '../services/paperBalanceService';
 import { invalidateIncomeCache } from '../api/income';
 import { logWithTimestamp, logErrorWithTimestamp, logWarnWithTimestamp } from '../utils/timestamp';
+import { paperTradeDb } from '../db/paperTradeDb';
 
 // Minimal local state - only track order IDs linked to positions
 interface PositionOrders {
   slOrderId?: number;
   tpOrderId?: number;
+  slPrice?: number;  // For paper mode simulation
+  tpPrice?: number;  // For paper mode simulation
 }
 
 // Exchange position from API
@@ -81,6 +85,7 @@ export class PositionManager extends EventEmitter implements PositionTracker {
   private orderPlacementLocks: Set<string> = new Set(); // Prevent concurrent order placement for same position
   private orderCancellationLocks: Set<string> = new Set(); // Prevent concurrent order cancellation for same symbol
   private symbolLeverage: Map<string, number> = new Map(); // Track leverage per symbol from ACCOUNT_CONFIG_UPDATE
+  private paperTradeIds: Map<string, number> = new Map(); // symbol_side -> paper trade DB ID
 
   constructor(config: Config, isHedgeMode: boolean = false) {
     super();
@@ -173,7 +178,8 @@ logErrorWithTimestamp('PositionManager: Failed to restart connection:', error);
   async start(): Promise<void> {
     if (this.isRunning) return;
     this.isRunning = true;
-logWithTimestamp('PositionManager: Starting...');
+    logWithTimestamp('PositionManager: Starting... (with paper trade restoration support)');
+    console.log('[PositionManager] START METHOD CALLED - paperMode:', this.config?.global?.paperMode);
 
     // Fetch exchange info to get symbol precision
     try {
@@ -185,14 +191,40 @@ logErrorWithTimestamp('PositionManager: Failed to fetch exchange info:', error.m
       // Continue anyway - will use raw values
     }
 
+    // Restore open paper trades from database if in paper mode
+    logWithTimestamp(`PositionManager: Checking paper mode... paperMode=${this.config.global.paperMode}`);
+    if (this.config.global.paperMode) {
+      await this.restorePaperTrades();
+    } else {
+      logWithTimestamp('PositionManager: Not in paper mode, skipping paper trade restoration');
+    }
+
     // Skip user data stream in paper mode with no API keys
     if (this.config.global.paperMode && (!this.config.api.apiKey || !this.config.api.secretKey)) {
 logWithTimestamp('PositionManager: Running in paper mode without API keys - simulating streams');
+      // Set up paper mode update interval
+      setInterval(() => this.updatePaperModePositions(), 5 * 1000);
+      return;
+    }
+
+    // In paper mode with API keys, skip exchange sync but start user data stream for real-time data
+    if (this.config.global.paperMode) {
+logWithTimestamp('PositionManager: Running in paper mode with API keys - skipping exchange sync to preserve restored positions');
+      // Set up paper mode update interval
+      setInterval(() => this.updatePaperModePositions(), 5 * 1000);
+
+      try {
+        // Start user data stream to receive balance updates and market data
+        await this.startUserDataStream();
+      } catch (error) {
+logErrorWithTimestamp('PositionManager: Failed to start user data stream:', error);
+        throw error;
+      }
       return;
     }
 
     try {
-      // First, sync with exchange to get current positions and orders
+      // First, sync with exchange to get current positions and orders (live mode only)
       await this.syncWithExchange();
       // Then start the user data stream for real-time updates
       await this.startUserDataStream();
@@ -234,6 +266,10 @@ logWithTimestamp('PositionManager WS connected');
       this.riskCheckInterval = setInterval(() => this.checkRisk(), 5 * 60 * 1000);
       // Order check every 30 seconds to ensure SL/TP quantities match positions
       this.orderCheckInterval = setInterval(() => this.checkAndAdjustOrders(), 30 * 1000);
+      // Paper mode: Update positions with mark prices every 5 seconds
+      if (this.config.global.paperMode) {
+        setInterval(() => this.updatePaperModePositions(), 5 * 1000);
+      }
 
       // Clean up orphaned orders immediately on startup, then every 30 seconds
       this.cleanupOrphanedOrders().catch(error => {
@@ -568,6 +604,11 @@ logErrorWithTimestamp('PositionManager: Failed to sync with exchange:', error);
 
   // Ensure position has SL/TP orders
   private async ensurePositionProtected(symbol: string, positionSide: string, positionAmt: number): Promise<void> {
+    // Skip protective orders in paper mode
+    if (this.config.global.paperMode) {
+      return;
+    }
+
     const key = this.getPositionKey(symbol, positionSide, positionAmt);
 
     // Check if order placement is already in progress for this position
@@ -1214,24 +1255,27 @@ logWithTimestamp(`PositionManager: Position ${key} is closed, removing order tra
   }
 
   // Listen for new positions from Hunter
-  public onNewPosition(data: { symbol: string; side: string; quantity: number; orderId?: number }): void {
+  public async onNewPosition(data: { symbol: string; side: string; quantity: number; margin?: number; orderId?: number; price?: number; paperMode?: boolean }): Promise<void> {
     // In the new architecture, we wait for ACCOUNT_UPDATE to confirm the position
     // The WebSocket will tell us when the position is actually open
 logWithTimestamp(`PositionManager: Notified of potential new position: ${data.symbol} ${data.side}`);
 
     // For paper mode, simulate the position
-    if (this.config.global.paperMode) {
+    if (this.config.global.paperMode && data.paperMode) {
       // Use the proper position side based on hedge mode
       const positionSide = this.isHedgeMode ?
         (data.side === 'BUY' ? 'LONG' : 'SHORT') : 'BOTH';
       const key = `${data.symbol}_${positionSide}`;
 
+      // Get entry price from data or fetch from market
+      const entryPrice = data.price?.toString() || '0';
+
       // Simulate the position in our map
       this.currentPositions.set(key, {
         symbol: data.symbol,
         positionAmt: data.side === 'BUY' ? data.quantity.toString() : (-data.quantity).toString(),
-        entryPrice: '0', // Will be updated by market price
-        markPrice: '0',
+        entryPrice: entryPrice,
+        markPrice: entryPrice, // Use entry price initially
         unRealizedProfit: '0',
         liquidationPrice: '0',
         leverage: this.config.symbols[data.symbol]?.leverage?.toString() || '10',
@@ -1242,13 +1286,72 @@ logWithTimestamp(`PositionManager: Notified of potential new position: ${data.sy
         updateTime: Date.now()
       });
 
-      // Place SL/TP for paper mode
-      this.ensurePositionProtected(data.symbol, positionSide, data.side === 'BUY' ? data.quantity : -data.quantity);
+logWithTimestamp(`PositionManager: Paper mode position created - ${data.symbol} ${positionSide} qty=${data.quantity} entry=${entryPrice}`);
+
+      // Save paper trade to database
+      const posAmt = parseFloat(data.side === 'BUY' ? data.quantity.toString() : (-data.quantity).toString());
+      const entryPriceNum = parseFloat(entryPrice);
+      const leverage = parseInt(this.config.symbols[data.symbol]?.leverage?.toString() || '10');
+      const quantity = Math.abs(posAmt);
+
+      // Use margin from data if provided (new format), otherwise calculate from quantity
+      const margin = data.margin !== undefined ? data.margin : (quantity * entryPriceNum) / leverage;
+
+      try {
+        const tradeId = await paperTradeDb.saveTrade({
+          symbol: data.symbol,
+          side: data.side,
+          position_side: positionSide,
+          quantity: quantity,
+          entry_price: entryPriceNum,
+          leverage: leverage,
+          margin: margin,
+          status: 'open',
+          opened_at: Date.now(),
+        });
+
+        // Store the trade ID for later updates
+        this.paperTradeIds.set(key, tradeId);
+        logWithTimestamp(`PositionManager: Paper trade saved to DB (ID: ${tradeId})`);
+
+        // Update paper balance service
+        const paperBalanceService = getPaperBalanceService();
+        if (paperBalanceService && paperBalanceService.isReady()) {
+          paperBalanceService.addPosition(data.symbol, positionSide as 'LONG' | 'SHORT', margin);
+        }
+      } catch (error) {
+        logErrorWithTimestamp('PositionManager: Failed to save paper trade to DB:', error);
+      }
+
+      // Broadcast paper mode position to UI
+      if (this.statusBroadcaster) {
+        this.statusBroadcaster.broadcastPositionUpdate({
+          symbol: data.symbol,
+          side: positionSide,
+          quantity: quantity,
+          entryPrice: entryPriceNum,
+          markPrice: entryPriceNum,
+          pnl: 0,
+          pnlPercent: 0,
+          margin: margin,
+          leverage: leverage,
+          hasStopLoss: false,
+          hasTakeProfit: false,
+          type: 'opened'
+        });
+      }
+
+      // Skip placing SL/TP orders in paper mode
     }
   }
 
   // Adjust protective orders when quantities don't match position size
   private async adjustProtectiveOrders(position: ExchangePosition, currentSlOrder?: ExchangeOrder, currentTpOrder?: ExchangeOrder): Promise<void> {
+    // Skip order adjustments in paper mode
+    if (this.config.global.paperMode) {
+      return;
+    }
+
     const symbol = position.symbol;
     const posAmt = parseFloat(position.positionAmt);
     const key = this.getPositionKey(symbol, position.positionSide, posAmt);
@@ -1354,7 +1457,44 @@ logWarnWithTimestamp(`PositionManager: No config for symbol ${symbol}`);
     if (!this.positionOrders.has(key)) {
       this.positionOrders.set(key, {});
     }
-    const orders = this.positionOrders.get(key)!;
+    const orders = this.positionOrders.get(key)!
+
+    // In paper mode, calculate and store SL/TP prices for simulation
+    if (this.config.global.paperMode) {
+      // Calculate SL price
+      const slPrice = isLong
+        ? entryPrice * (1 - symbolConfig.slPercent / 100)
+        : entryPrice * (1 + symbolConfig.slPercent / 100);
+
+      // Calculate TP price
+      const tpPrice = isLong
+        ? entryPrice * (1 + symbolConfig.tpPercent / 100)
+        : entryPrice * (1 - symbolConfig.tpPercent / 100);
+
+      // Store in orders map for simulation
+      orders.slPrice = slPrice;
+      orders.tpPrice = tpPrice;
+
+logWithTimestamp(`PositionManager: [Paper Mode] Set SL/TP for ${symbol}:`);
+logWithTimestamp(`  Entry: ${entryPrice.toFixed(4)}, SL: ${slPrice.toFixed(4)}, TP: ${tpPrice.toFixed(4)}`);
+
+      if (this.statusBroadcaster) {
+        this.statusBroadcaster.broadcastStopLossPlaced({
+          symbol,
+          price: slPrice,
+          quantity,
+          orderId: 'paper-sl',
+        });
+        this.statusBroadcaster.broadcastTakeProfitPlaced({
+          symbol,
+          price: tpPrice,
+          quantity,
+          orderId: 'paper-tp',
+        });
+      }
+
+      return;
+    };
 
     // Double-check existing orders before placing new ones
     try {
@@ -2263,6 +2403,11 @@ logErrorWithTimestamp('PositionManager: Error during orphaned order cleanup:', e
       return; // No positions to check
     }
 
+    // Skip order checking in paper mode - no real orders to manage
+    if (this.config.global.paperMode) {
+      return;
+    }
+
 logWithTimestamp(`PositionManager: Checking ${this.currentPositions.size} position(s) for order adjustments`);
 
     try {
@@ -2591,20 +2736,29 @@ logWarnWithTimestamp(`PositionManager: Position ${symbol} ${side} not found`);
       await this.cancelProtectiveOrders(targetKey, orders);
     }
 
-    // Place market close order
+    // Place market close order (skip in paper mode)
     const posAmt = parseFloat(targetPosition.positionAmt);
     const quantity = Math.abs(posAmt);
     const closeSide = posAmt > 0 ? 'SELL' : 'BUY';
+    const entryPrice = parseFloat(targetPosition.entryPrice);
+    const markPrice = parseFloat(targetPosition.markPrice);
+    const pnl = parseFloat(targetPosition.unRealizedProfit);
 
-    await placeOrder({
-      symbol,
-      side: closeSide,
-      type: 'MARKET',
-      quantity: quantity,
-      positionSide: (targetPosition.positionSide || 'BOTH') as 'BOTH' | 'LONG' | 'SHORT',
-      // Only use reduceOnly in One-way mode
-      ...(targetPosition.positionSide === 'BOTH' ? { reduceOnly: true } : {}),
-    }, this.config.api);
+    if (!this.config.global.paperMode) {
+      await placeOrder({
+        symbol,
+        side: closeSide,
+        type: 'MARKET',
+        quantity: quantity,
+        positionSide: (targetPosition.positionSide || 'BOTH') as 'BOTH' | 'LONG' | 'SHORT',
+        // Only use reduceOnly in One-way mode
+        ...(targetPosition.positionSide === 'BOTH' ? { reduceOnly: true } : {}),
+      }, this.config.api);
+    } else {
+      // Close paper trade in database
+      const pnlPercent = entryPrice > 0 ? (pnl / (quantity * entryPrice)) * 100 : 0;
+      await this.closePaperTrade(targetKey, markPrice, pnl, pnlPercent, 'Manual close');
+    }
 
     // Remove from our maps (will be confirmed by ACCOUNT_UPDATE)
     this.currentPositions.delete(targetKey);
@@ -2733,6 +2887,350 @@ logErrorWithTimestamp('PositionManager: Failed to refresh balance:', error);
   // Get Map of positions for direct access
   public getPositionsMap(): Map<string, ExchangePosition> {
     return this.currentPositions;
+  }
+
+  // Update paper mode positions with current mark prices and PnL
+  private async updatePaperModePositions(): Promise<void> {
+    if (!this.config.global.paperMode || this.currentPositions.size === 0) {
+      return;
+    }
+
+    const priceService = getPriceService();
+    if (!priceService) {
+      return;
+    }
+
+    const positionsToClose: Array<{ key: string; reason: string; price: number }> = [];
+
+    for (const [key, position] of this.currentPositions.entries()) {
+      const symbol = position.symbol;
+      const entryPrice = parseFloat(position.entryPrice);
+
+      // Skip positions with invalid entry prices
+      if (!entryPrice || entryPrice <= 0) {
+        continue;
+      }
+
+      // Get current mark price
+      const priceData = priceService.getMarkPrice(symbol);
+      if (!priceData || !priceData.markPrice) {
+        continue;
+      }
+
+      const markPrice = parseFloat(priceData.markPrice);
+      if (markPrice <= 0) {
+        continue;
+      }
+
+      const posAmt = parseFloat(position.positionAmt);
+      const isLong = posAmt > 0;
+
+      // Check for SL/TP hits in paper mode
+      const orders = this.positionOrders.get(key);
+      if (orders) {
+        const { slPrice, tpPrice } = orders;
+
+        // Check Stop Loss hit
+        if (slPrice) {
+          const slHit = isLong ? (markPrice <= slPrice) : (markPrice >= slPrice);
+          if (slHit) {
+            positionsToClose.push({ key, reason: 'SL', price: slPrice });
+            continue; // Skip further processing for this position
+          }
+        }
+
+        // Check Take Profit hit
+        if (tpPrice) {
+          const tpHit = isLong ? (markPrice >= tpPrice) : (markPrice <= tpPrice);
+          if (tpHit) {
+            positionsToClose.push({ key, reason: 'TP', price: tpPrice });
+            continue; // Skip further processing for this position
+          }
+        }
+      }
+
+      // Calculate unrealized PnL
+      const pnl = isLong
+        ? (markPrice - entryPrice) * Math.abs(posAmt)
+        : (entryPrice - markPrice) * Math.abs(posAmt);
+
+      // Update position
+      position.markPrice = markPrice.toString();
+      position.unRealizedProfit = pnl.toFixed(4);
+      position.updateTime = Date.now();
+
+      // Update paper trade in database with max/min PnL tracking
+      const tradeId = this.paperTradeIds.get(key);
+      if (tradeId) {
+        try {
+          // Get current trade from DB to check max/min
+          const currentTrade = await paperTradeDb.getTrade(tradeId);
+          if (currentTrade) {
+            const maxPnl = Math.max(currentTrade.max_pnl || 0, pnl);
+            const minPnl = Math.min(currentTrade.min_pnl || 0, pnl);
+
+            await paperTradeDb.updateTrade(tradeId, {
+              pnl: pnl,
+              max_pnl: maxPnl,
+              min_pnl: minPnl,
+            });
+
+            // Update paper balance service with current P&L
+            const paperBalanceService = getPaperBalanceService();
+            if (paperBalanceService && paperBalanceService.isReady()) {
+              const positionSide = position.positionSide as 'LONG' | 'SHORT';
+              paperBalanceService.updatePositionPnL(symbol, positionSide, pnl);
+            }
+          }
+        } catch (error) {
+          // Don't log errors for every update - too noisy
+        }
+      }
+
+      // Broadcast updated position to UI
+      if (this.statusBroadcaster) {
+        const leverage = parseInt(position.leverage || '10');
+        const quantity = Math.abs(posAmt);
+        const notionalValue = quantity * entryPrice;
+        const pnlPercent = (pnl / notionalValue) * 100;
+
+        const hasStopLoss = orders?.slPrice !== undefined;
+        const hasTakeProfit = orders?.tpPrice !== undefined;
+
+        this.statusBroadcaster.broadcastPositionUpdate({
+          symbol: position.symbol,
+          side: position.positionSide as 'LONG' | 'SHORT' | 'BOTH',
+          quantity: quantity,
+          entryPrice: entryPrice,
+          markPrice: markPrice,
+          pnl: pnl,
+          pnlPercent: pnlPercent,
+          margin: notionalValue / leverage,
+          leverage: leverage,
+          hasStopLoss: hasStopLoss,
+          hasTakeProfit: hasTakeProfit,
+          type: 'updated'
+        });
+      }
+    }
+
+    // Close positions that hit SL/TP
+    for (const { key, reason, price } of positionsToClose) {
+      const position = this.currentPositions.get(key);
+      if (!position) continue;
+
+      const posAmt = parseFloat(position.positionAmt);
+      const entryPrice = parseFloat(position.entryPrice);
+      const isLong = posAmt > 0;
+      const quantity = Math.abs(posAmt);
+
+      // Calculate final PnL
+      const pnl = isLong
+        ? (price - entryPrice) * quantity
+        : (entryPrice - price) * quantity;
+
+      const notionalValue = quantity * entryPrice;
+      const pnlPercent = (pnl / notionalValue) * 100;
+
+logWithTimestamp(`PositionManager: [Paper Mode] ${reason} hit for ${position.symbol} at ${price.toFixed(4)}`);
+logWithTimestamp(`  PnL: ${pnl.toFixed(2)} USDT (${pnlPercent.toFixed(2)}%)`);
+
+      // Close paper trade in database
+      const tradeId = this.paperTradeIds.get(key);
+      if (tradeId) {
+        try {
+          await paperTradeDb.closeTrade(tradeId, price, pnl, pnlPercent, reason);
+        } catch (error) {
+          logErrorWithTimestamp(`PositionManager: Failed to close paper trade ${tradeId}:`, error);
+        }
+        this.paperTradeIds.delete(key);
+      }
+
+      // Remove position and orders
+      this.currentPositions.delete(key);
+      this.positionOrders.delete(key);
+
+      // Broadcast position closed
+      if (this.statusBroadcaster) {
+        this.statusBroadcaster.broadcastPositionClosed({
+          symbol: position.symbol,
+          side: isLong ? 'LONG' : 'SHORT',
+          quantity: quantity,
+          pnl: pnl,
+          reason: `Paper mode ${reason}`,
+        });
+      }
+    }
+  }
+
+  // Restore open paper trades from database on startup
+  private async restorePaperTrades(): Promise<void> {
+    try {
+      logWithTimestamp('PositionManager: Attempting to restore paper trades from database...');
+
+      // Only restore trades from the last 12 hours to avoid accumulating stale positions
+      const twelveHoursAgo = Date.now() - (12 * 60 * 60 * 1000);
+
+      const allOpenTrades = await paperTradeDb.getTrades({ status: 'open' });
+
+      // Filter for recent trades only
+      const recentTrades = allOpenTrades.filter(trade => trade.opened_at >= twelveHoursAgo);
+      const staleTrades = allOpenTrades.filter(trade => trade.opened_at < twelveHoursAgo);
+
+      // Auto-close stale trades
+      if (staleTrades.length > 0) {
+        logWithTimestamp(`PositionManager: Found ${staleTrades.length} stale paper trades (>12h old), closing them...`);
+        for (const trade of staleTrades) {
+          if (trade.id) {
+            try {
+              await paperTradeDb.closeTrade(trade.id, trade.entry_price, 0, 0, 'Auto-closed (stale)');
+            } catch (error) {
+              logErrorWithTimestamp(`PositionManager: Failed to close stale trade ${trade.id}:`, error);
+            }
+          }
+        }
+        logWithTimestamp(`PositionManager: ✅ Closed ${staleTrades.length} stale trades`);
+      }
+
+      if (recentTrades.length === 0) {
+        logWithTimestamp('PositionManager: No recent open paper trades to restore');
+        return;
+      }
+
+      logWithTimestamp(`PositionManager: Found ${recentTrades.length} recent open paper trades to restore (ignoring ${staleTrades.length} stale trades)`);
+
+      let restoredCount = 0;
+      for (const trade of recentTrades) {
+        // Skip if trade doesn't have an ID
+        if (!trade.id) {
+          logWarnWithTimestamp(`PositionManager: Skipping trade without ID: ${trade.symbol}`);
+          continue;
+        }
+
+        // Reconstruct position key
+        const positionSide = trade.position_side;
+        const key = this.isHedgeMode
+          ? `${trade.symbol}_${positionSide}`
+          : trade.symbol;
+
+        // Store the trade ID for future updates
+        this.paperTradeIds.set(key, trade.id);
+
+        // Reconstruct the position in currentPositions map
+        const posAmt = trade.side === 'BUY' ? trade.quantity : -trade.quantity;
+
+        const position: ExchangePosition = {
+          symbol: trade.symbol,
+          positionAmt: posAmt.toString(),
+          entryPrice: trade.entry_price.toString(),
+          markPrice: '0', // Will be updated by updatePaperModePositions
+          unRealizedProfit: '0',
+          liquidationPrice: '0',
+          leverage: trade.leverage.toString(),
+          marginType: 'cross',
+          isolatedMargin: '0',
+          isAutoAddMargin: 'false',
+          positionSide: positionSide,
+          updateTime: trade.opened_at
+        };
+
+        this.currentPositions.set(key, position);
+
+        // Restore SL/TP prices for paper mode simulation
+        const symbolConfig = this.config.symbols[trade.symbol];
+        if (symbolConfig) {
+          const isLong = trade.side === 'BUY';
+          const slPrice = isLong
+            ? trade.entry_price * (1 - symbolConfig.slPercent / 100)
+            : trade.entry_price * (1 + symbolConfig.slPercent / 100);
+          const tpPrice = isLong
+            ? trade.entry_price * (1 + symbolConfig.tpPercent / 100)
+            : trade.entry_price * (1 - symbolConfig.tpPercent / 100);
+
+          if (!this.positionOrders.has(key)) {
+            this.positionOrders.set(key, {});
+          }
+          const orders = this.positionOrders.get(key)!;
+          orders.slPrice = slPrice;
+          orders.tpPrice = tpPrice;
+
+          logWithTimestamp(`PositionManager: ✓ Restored ${trade.symbol} ${trade.side} ${positionSide} - Entry: $${trade.entry_price}, SL: $${slPrice.toFixed(4)}, TP: $${tpPrice.toFixed(4)}, Qty: ${trade.quantity}, PnL: $${trade.pnl?.toFixed(2) || '0.00'}`);
+        } else {
+          logWithTimestamp(`PositionManager: ✓ Restored ${trade.symbol} ${trade.side} ${positionSide} - Entry: $${trade.entry_price}, Qty: ${trade.quantity}, PnL: $${trade.pnl?.toFixed(2) || '0.00'}`);
+        }
+
+        restoredCount++;
+      }
+
+      logWithTimestamp(`PositionManager: ✅ Successfully restored ${restoredCount}/${recentTrades.length} recent paper trades`);
+
+      // Broadcast restored positions to UI if status broadcaster is available
+      if (this.statusBroadcaster && restoredCount > 0) {
+        logWithTimestamp('PositionManager: Broadcasting restored positions to UI...');
+
+        // Broadcast each restored position with full data
+        for (const [key, position] of this.currentPositions.entries()) {
+          const posAmt = parseFloat(position.positionAmt);
+          if (Math.abs(posAmt) > 0) {
+            const entryPrice = parseFloat(position.entryPrice);
+            const quantity = Math.abs(posAmt);
+            const leverage = parseInt(position.leverage || '10');
+            const notionalValue = quantity * entryPrice;
+
+            // Check if position has SL/TP
+            const orders = this.positionOrders.get(key);
+            const hasStopLoss = orders?.slPrice !== undefined;
+            const hasTakeProfit = orders?.tpPrice !== undefined;
+
+            this.statusBroadcaster.broadcastPositionUpdate({
+              symbol: position.symbol,
+              side: position.positionSide as 'LONG' | 'SHORT' | 'BOTH',
+              quantity: quantity,
+              entryPrice: entryPrice,
+              markPrice: entryPrice, // Will be updated by updatePaperModePositions
+              pnl: 0, // Will be calculated by updatePaperModePositions
+              pnlPercent: 0,
+              margin: notionalValue / leverage,
+              leverage: leverage,
+              hasStopLoss: hasStopLoss,
+              hasTakeProfit: hasTakeProfit,
+              type: 'opened'
+            });
+          }
+        }
+
+        logWithTimestamp(`PositionManager: Broadcasted ${this.currentPositions.size} positions to UI`);
+      }
+    } catch (error) {
+      logErrorWithTimestamp('PositionManager: ❌ Failed to restore paper trades:', error);
+    }
+  }
+
+  // Close paper trade in database
+  private async closePaperTrade(key: string, exitPrice: number, pnl: number, pnlPercent: number, closeReason: string): Promise<void> {
+    const tradeId = this.paperTradeIds.get(key);
+    if (!tradeId) {
+      return;
+    }
+
+    try {
+      await paperTradeDb.closeTrade(tradeId, exitPrice, pnl, pnlPercent, closeReason);
+      this.paperTradeIds.delete(key);
+      logWithTimestamp(`PositionManager: Paper trade ${tradeId} closed - ${closeReason}, PnL: $${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)`);
+
+      // Update paper balance service
+      const paperBalanceService = getPaperBalanceService();
+      if (paperBalanceService && paperBalanceService.isReady()) {
+        // Extract symbol and side from key
+        const parts = key.split('_');
+        const symbol = parts.slice(0, -1).join('_');  // Handle symbols with underscores
+        const side = parts[parts.length - 1] as 'LONG' | 'SHORT';
+
+        paperBalanceService.closePosition(symbol, side, pnl);
+      }
+    } catch (error) {
+      logErrorWithTimestamp('PositionManager: Failed to close paper trade in DB:', error);
+    }
   }
 
   // Get position count for a specific symbol and side

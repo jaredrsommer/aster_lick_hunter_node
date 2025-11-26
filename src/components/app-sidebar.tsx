@@ -14,6 +14,8 @@ import {
   RefreshCw,
   Bug,
   Target,
+  Users,
+  BarChart3,
 } from "lucide-react"
 
 import { RateLimitSidebar } from "@/components/RateLimitSidebar"
@@ -49,6 +51,16 @@ const navigation = [
     title: "Configuration",
     icon: Settings,
     href: "/config",
+  },
+  {
+    title: "Copy Trading",
+    icon: Users,
+    href: "/copy-trading",
+  },
+  {
+    title: "Liquidations",
+    icon: BarChart3,
+    href: "/liquidations",
   },
   {
     title: "Optimizer",

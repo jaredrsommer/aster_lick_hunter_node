@@ -122,10 +122,11 @@ export function OptimizerWeightSliders({
           step={5}
           value={[drawdown]}
           onValueChange={(value) => handleDrawdownChange(value[0])}
-          className="w-full"
+          className="w-full opacity-60 cursor-not-allowed"
+          disabled
         />
         <p className="text-xs text-muted-foreground">
-          Prioritize capital preservation
+          Auto-calculated to maintain 100% total (read-only)
         </p>
       </div>
 
@@ -138,7 +139,7 @@ export function OptimizerWeightSliders({
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          💡 Tip: Adjusting PnL or Sharpe will auto-adjust Drawdown to maintain 100% total
+          💡 Tip: Drawdown weight is automatically calculated as the remainder to ensure 100% total
         </p>
       </div>
     </div>

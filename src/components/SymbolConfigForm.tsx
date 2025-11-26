@@ -24,6 +24,9 @@ import {
   AlertCircle,
   Settings2,
   BarChart3,
+  Bell,
+  MessageSquare,
+  Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -688,6 +691,347 @@ export default function SymbolConfigForm({ onSave, currentConfig }: SymbolConfig
                   {config.global.server?.dashboardPassword && " Password protection is active - you'll need to login to access the dashboard."}
                 </AlertDescription>
               </Alert>
+            </CardContent>
+          </Card>
+
+          {/* Telegram Configuration Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Telegram Notifications
+              </CardTitle>
+              <CardDescription>
+                Receive real-time trading alerts via Telegram bot
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="telegramEnabled">Enable Telegram Bot</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Send notifications to Telegram when positions open/close
+                  </p>
+                </div>
+                <Switch
+                  id="telegramEnabled"
+                  checked={config.global.telegram?.enabled || false}
+                  onCheckedChange={(checked) => {
+                    handleGlobalChange('telegram', {
+                      ...config.global.telegram,
+                      enabled: checked
+                    });
+                  }}
+                />
+              </div>
+
+              {config.global.telegram?.enabled && (
+                <>
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label htmlFor="botToken">Bot Token</Label>
+                    <Input
+                      id="botToken"
+                      type="password"
+                      value={config.global.telegram?.botToken || ''}
+                      onChange={(e) => {
+                        handleGlobalChange('telegram', {
+                          ...config.global.telegram,
+                          botToken: e.target.value
+                        });
+                      }}
+                      placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
+                      className="font-mono"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Get your bot token from <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" className="underline">@BotFather</a> on Telegram
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="chatId">Chat ID</Label>
+                    <Input
+                      id="chatId"
+                      type="text"
+                      value={config.global.telegram?.chatId || ''}
+                      onChange={(e) => {
+                        handleGlobalChange('telegram', {
+                          ...config.global.telegram,
+                          chatId: e.target.value
+                        });
+                      }}
+                      placeholder="123456789"
+                      className="font-mono"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Your Telegram chat ID - Send /start to your bot to get it
+                    </p>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <Label>Notification Preferences</Label>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyPositionOpened"
+                          checked={config.global.telegram?.notifications?.positionOpened !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                positionOpened: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyPositionOpened" className="cursor-pointer text-sm">Position Opened</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyPositionClosed"
+                          checked={config.global.telegram?.notifications?.positionClosed !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                positionClosed: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyPositionClosed" className="cursor-pointer text-sm">Position Closed</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyStopLoss"
+                          checked={config.global.telegram?.notifications?.stopLossHit !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                stopLossHit: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyStopLoss" className="cursor-pointer text-sm">Stop Loss Hit</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyTakeProfit"
+                          checked={config.global.telegram?.notifications?.takeProfitHit !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                takeProfitHit: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyTakeProfit" className="cursor-pointer text-sm">Take Profit Hit</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyTradeBlocked"
+                          checked={config.global.telegram?.notifications?.tradeBlocked !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                tradeBlocked: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyTradeBlocked" className="cursor-pointer text-sm">Trade Blocked</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyErrors"
+                          checked={config.global.telegram?.notifications?.errors !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                errors: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyErrors" className="cursor-pointer text-sm">Errors</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifyLowBalance"
+                          checked={config.global.telegram?.notifications?.lowBalance !== false}
+                          onCheckedChange={(checked) => {
+                            handleGlobalChange('telegram', {
+                              ...config.global.telegram,
+                              notifications: {
+                                ...config.global.telegram?.notifications,
+                                lowBalance: checked
+                              }
+                            });
+                          }}
+                        />
+                        <Label htmlFor="notifyLowBalance" className="cursor-pointer text-sm">Low Balance</Label>
+                      </div>
+
+                      {config.global.telegram?.notifications?.lowBalance !== false && (
+                        <div className="space-y-2">
+                          <Label htmlFor="lowBalanceThreshold" className="text-sm">Low Balance Threshold (USDT)</Label>
+                          <Input
+                            id="lowBalanceThreshold"
+                            type="number"
+                            value={config.global.telegram?.notifications?.lowBalanceThreshold || 100}
+                            onChange={(e) => {
+                              handleGlobalChange('telegram', {
+                                ...config.global.telegram,
+                                notifications: {
+                                  ...config.global.telegram?.notifications,
+                                  lowBalanceThreshold: parseFloat(e.target.value) || 100
+                                }
+                              });
+                            }}
+                            min="0"
+                            step="10"
+                            className="w-32"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Alert>
+                    <MessageSquare className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Setup Instructions:</strong> Create a bot with @BotFather, get your token, then send /start to your bot to get your Chat ID.
+                    </AlertDescription>
+                  </Alert>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Copy Trading Configuration Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Copy Trading
+              </CardTitle>
+              <CardDescription>
+                Mirror trades from a master wallet to follower wallets
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="copyTradingEnabled">Enable Copy Trading</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Automatically copy trades to configured follower wallets
+                  </p>
+                </div>
+                <Switch
+                  id="copyTradingEnabled"
+                  checked={config.global.copyTrading?.enabled || false}
+                  onCheckedChange={(checked) => {
+                    handleGlobalChange('copyTrading', {
+                      ...config.global.copyTrading,
+                      enabled: checked
+                    });
+                  }}
+                />
+              </div>
+
+              {config.global.copyTrading?.enabled && (
+                <>
+                  <Separator />
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="syncTPSL"
+                      checked={config.global.copyTrading?.syncTPSL !== false}
+                      onCheckedChange={(checked) => {
+                        handleGlobalChange('copyTrading', {
+                          ...config.global.copyTrading,
+                          syncTPSL: checked
+                        });
+                      }}
+                    />
+                    <div>
+                      <Label htmlFor="syncTPSL" className="cursor-pointer">Sync TP/SL Changes</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Automatically update stop-loss and take-profit when master wallet adjusts them
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="syncClose"
+                      checked={config.global.copyTrading?.syncClose !== false}
+                      onCheckedChange={(checked) => {
+                        handleGlobalChange('copyTrading', {
+                          ...config.global.copyTrading,
+                          syncClose: checked
+                        });
+                      }}
+                    />
+                    <div>
+                      <Label htmlFor="syncClose" className="cursor-pointer">Auto-Close Positions</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Automatically close follower positions when master closes
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="copyDelay">Copy Delay (milliseconds)</Label>
+                    <Input
+                      id="copyDelay"
+                      type="number"
+                      value={config.global.copyTrading?.delayMs || 0}
+                      onChange={(e) => {
+                        handleGlobalChange('copyTrading', {
+                          ...config.global.copyTrading,
+                          delayMs: parseInt(e.target.value) || 0
+                        });
+                      }}
+                      min="0"
+                      step="100"
+                      className="w-32"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Optional delay between master and follower trades (0 = instant)
+                    </p>
+                  </div>
+
+                  <Alert>
+                    <Users className="h-4 w-4" />
+                    <AlertDescription>
+                      Configure follower wallets in the <strong>Copy Trading</strong> page from the navigation menu.
+                    </AlertDescription>
+                  </Alert>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

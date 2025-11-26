@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -226,14 +227,15 @@ export default function CopyTradingPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Copy Trading</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage follower wallets that copy your master account trades
-          </p>
-        </div>
+    <DashboardLayout>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Copy Trading</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage follower wallets that copy your master account trades
+            </p>
+          </div>
         <Button
           onClick={() => {
             resetForm();
@@ -466,6 +468,7 @@ export default function CopyTradingPage() {
           })
         )}
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

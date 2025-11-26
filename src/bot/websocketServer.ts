@@ -290,9 +290,17 @@ export class StatusBroadcaster extends EventEmitter {
     symbol: string;
     side: string;
     quantity: number;
-    price: number;
-    type: 'opened' | 'closed' | 'updated';
+    price?: number;
+    entryPrice?: number;
+    markPrice?: number;
     pnl?: number;
+    pnlPercent?: number;
+    margin?: number;
+    leverage?: number;
+    liquidationPrice?: number;
+    hasStopLoss?: boolean;
+    hasTakeProfit?: boolean;
+    type: 'opened' | 'closed' | 'updated';
   }): void {
     this._broadcast('position_update', {
       ...data,

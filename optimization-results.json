@@ -1,0 +1,2674 @@
+{
+  "timestamp": "2025-11-13T05:15:15.115Z",
+  "summary": {
+    "currentDailyPnl": 8695.288293701555,
+    "optimizedDailyPnl": 9328.699968363926,
+    "dailyImprovement": 633.411674662371,
+    "monthlyImprovement": 19002.350239871128,
+    "improvementPercent": 7.284539089074064,
+    "recommendedMaxOpenPositions": 8
+  },
+  "recommendations": [
+    {
+      "symbol": "BNBUSDT",
+      "thresholds": {
+        "current": {
+          "long": 90,
+          "short": 100
+        },
+        "optimized": {
+          "long": 68,
+          "short": 100
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 0.5,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 6,
+          "slPercent": 1,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": 612.0482465390664,
+        "short": 0,
+        "total": 612.0482465390664
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 35.78255893593251,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 2,
+            "winRate": 100,
+            "pnl": 61.284569208393606,
+            "sharpe": 5.96121580807729,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 37.19319595737715,
+        "sharpeRatio": 2.5,
+        "drawdownScore": 30.642284604196803,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "thresholds": {
+        "current": {
+          "long": 50,
+          "short": 225840
+        },
+        "optimized": {
+          "long": 75,
+          "short": 338760
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 1000,
+          "leverage": 25,
+          "tpPercent": 5,
+          "slPercent": 1.5,
+          "maxPositionsLong": 10,
+          "maxPositionsShort": 10,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 1000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 1.5,
+          "maxPositionsLong": 10,
+          "maxPositionsShort": 10,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": -25.59509155083454,
+        "short": 46.95851967413907,
+        "total": 21.363428123304516
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 6,
+            "winRate": 100,
+            "pnl": 332.76101821151514,
+            "sharpe": 1.8121309650917024,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 1,
+            "winRate": 0,
+            "pnl": -52.51249999999953,
+            "sharpe": 0,
+            "maxDrawdown": 52.51249999999953
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 7,
+            "winRate": 100,
+            "pnl": 304.1386882405091,
+            "sharpe": 2.865793975899269,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 181.44433261590768,
+        "sharpeRatio": 1.4328969879496345,
+        "drawdownScore": 152.06934412025456,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "thresholds": {
+        "current": {
+          "long": 125,
+          "short": 75
+        },
+        "optimized": {
+          "long": 125,
+          "short": 75
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 1000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 1.5,
+          "maxPositionsLong": 10,
+          "maxPositionsShort": 10,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 1000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 1.5,
+          "maxPositionsLong": 10,
+          "maxPositionsShort": 10,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": 0,
+        "short": 0,
+        "total": 0
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 3,
+            "winRate": 100,
+            "pnl": 40.43381735050278,
+            "sharpe": 4.0229239511678365,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 5,
+            "winRate": 100,
+            "pnl": 140.23360592946065,
+            "sharpe": 1.325140262810017,
+            "maxDrawdown": 0
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 3,
+            "winRate": 100,
+            "pnl": 40.43381735050278,
+            "sharpe": 4.0229239511678365,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 5,
+            "winRate": 100,
+            "pnl": 140.23360592946065,
+            "sharpe": 1.325140262810017,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 109.20266360007474,
+        "sharpeRatio": 2.6740321069889266,
+        "drawdownScore": 90.33371163998171,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "SUIUSDT",
+      "thresholds": {
+        "current": {
+          "long": 30,
+          "short": 100
+        },
+        "optimized": {
+          "long": 30,
+          "short": 100
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 111,
+          "longTradeSize": 111,
+          "shortTradeSize": 111,
+          "maxPositionMarginUSDT": 999,
+          "leverage": 25,
+          "tpPercent": 5,
+          "slPercent": 0.25,
+          "maxPositionsLong": 9,
+          "maxPositionsShort": 9,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 111,
+          "longTradeSize": 111,
+          "shortTradeSize": 111,
+          "maxPositionMarginUSDT": 999,
+          "leverage": 25,
+          "tpPercent": 5,
+          "slPercent": 0.25,
+          "maxPositionsLong": 9,
+          "maxPositionsShort": 9,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": 0,
+        "short": 0,
+        "total": 0
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 133.25549999999967,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 133.25549999999967,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 79.9532999999998,
+        "sharpeRatio": 0,
+        "drawdownScore": 66.62774999999984,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "thresholds": {
+        "current": {
+          "long": 100,
+          "short": 50
+        },
+        "optimized": {
+          "long": 100,
+          "short": 50
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 0.25,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 0.25,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": 0,
+        "short": 0,
+        "total": 0
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 50.56222836902014,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 50.56222836902014,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 30.337337021412083,
+        "sharpeRatio": 0,
+        "drawdownScore": 25.28111418451007,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "thresholds": {
+        "current": {
+          "long": 50,
+          "short": 100
+        },
+        "optimized": {
+          "long": 50,
+          "short": 100
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 4.5,
+          "slPercent": 1.25,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 4.5,
+          "slPercent": 1.25,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": 0,
+        "short": 0,
+        "total": 0
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 107.56249999999986,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 1,
+            "winRate": 100,
+            "pnl": 107.56249999999986,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 64.53749999999991,
+        "sharpeRatio": 0,
+        "drawdownScore": 53.78124999999993,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "ASTERUSDT",
+      "thresholds": {
+        "current": {
+          "long": 125,
+          "short": 1360
+        },
+        "optimized": {
+          "long": 125,
+          "short": 1360
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 0.69,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 20,
+          "tpPercent": 6,
+          "slPercent": 1.5,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 14492,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 0.69,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 20,
+          "tpPercent": 6,
+          "slPercent": 1.5,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 14492,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": false
+        }
+      },
+      "improvement": {
+        "long": 0,
+        "short": 0,
+        "total": 0
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 21,
+            "winRate": 42.857142857142854,
+            "pnl": 461.66606313017047,
+            "sharpe": 0.32151782392817585,
+            "maxDrawdown": 204.82862316712266
+          },
+          "short": {
+            "trades": 1,
+            "winRate": 0,
+            "pnl": -0.2898689999999958,
+            "sharpe": 0,
+            "maxDrawdown": 0.2898689999999958
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 21,
+            "winRate": 42.857142857142854,
+            "pnl": 461.66606313017047,
+            "sharpe": 0.32151782392817585,
+            "maxDrawdown": 204.82862316712266
+          },
+          "short": {
+            "trades": 1,
+            "winRate": 0,
+            "pnl": -0.2898689999999958,
+            "sharpe": 0,
+            "maxDrawdown": 0.2898689999999958
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 231.1846357529842,
+        "sharpeRatio": 0.16075891196408792,
+        "drawdownScore": 2.2415550715487993,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    },
+    {
+      "symbol": "1000BONKUSDT",
+      "thresholds": {
+        "current": {
+          "long": 100,
+          "short": 100
+        },
+        "optimized": {
+          "long": 100,
+          "short": 100
+        }
+      },
+      "settings": {
+        "current": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 10,
+          "tpPercent": 3,
+          "slPercent": 2,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "optimized": {
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 10,
+          "tpPercent": 3,
+          "slPercent": 2,
+          "maxPositionsLong": 100,
+          "maxPositionsShort": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "vwapProtection": true
+        }
+      },
+      "improvement": {
+        "long": 0,
+        "short": 0,
+        "total": 0
+      },
+      "performance": {
+        "current": {
+          "long": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        },
+        "optimized": {
+          "long": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          },
+          "short": {
+            "trades": 0,
+            "winRate": 0,
+            "pnl": 0,
+            "sharpe": 0,
+            "maxDrawdown": 0
+          }
+        }
+      },
+      "scoring": {
+        "finalScore": 0,
+        "sharpeRatio": 0,
+        "drawdownScore": 0,
+        "weights": {
+          "pnl": 0.4761904761904762,
+          "sharpe": 0.28571428571428575,
+          "drawdown": 0.2380952380952381
+        },
+        "weightPercent": {
+          "pnl": 47.61904761904761,
+          "sharpe": 28.57142857142857,
+          "drawdown": 23.809523809523807
+        }
+      }
+    }
+  ],
+  "capitalAllocation": {
+    "currentAllocation": 52999,
+    "maxSafeAllocation": 0,
+    "isOverallocated": true,
+    "rankedSymbols": [
+      {
+        "symbol": "BNBUSDT",
+        "currentLong": 90,
+        "currentShort": 100,
+        "optimizedLong": 68,
+        "optimizedShort": 100,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 100,
+        "currentMargin": 10000,
+        "currentLeverage": 25,
+        "currentTp": 3,
+        "currentSl": 0.5,
+        "currentLongMaxPositions": 100,
+        "currentShortMaxPositions": 100,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 100,
+        "optimizedMargin": 10000,
+        "optimizedLeverage": 25,
+        "optimizedTp": 6,
+        "optimizedSl": 1,
+        "optimizedLongMaxPositions": 100,
+        "optimizedShortMaxPositions": 100,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 612.0482465390664,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 612.0482465390664,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 35.78255893593251,
+            "winRate": 100,
+            "avgWin": 35.78255893593251,
+            "avgLoss": 0,
+            "avgDuration": 119.37891666666665,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "BNBUSDT",
+                "side": "LONG",
+                "entryPrice": 945.391,
+                "exitPrice": 959.518,
+                "triggerPrice": 959.518,
+                "slippage": 0,
+                "grossPnl": 37.35755893593251,
+                "commission": 1.5750000000000002,
+                "pnl": 35.78255893593251,
+                "exitReason": "EOD",
+                "duration": 7162735,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 1,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 35.78255893593251,
+          "dailyPnl": 858.7814144623801
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 2,
+            "wins": 2,
+            "losses": 0,
+            "totalPnl": 61.284569208393606,
+            "winRate": 100,
+            "avgWin": 30.642284604196803,
+            "avgLoss": 0,
+            "avgDuration": 121.67035833333333,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "BNBUSDT",
+                "side": "LONG",
+                "entryPrice": 949.237,
+                "exitPrice": 959.518,
+                "triggerPrice": 959.518,
+                "slippage": 0,
+                "grossPnl": 27.0770102724611,
+                "commission": 1.5750000000000002,
+                "pnl": 25.5020102724611,
+                "exitReason": "EOD",
+                "duration": 7437708,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BNBUSDT",
+                "side": "LONG",
+                "entryPrice": 945.391,
+                "exitPrice": 959.518,
+                "triggerPrice": 959.518,
+                "slippage": 0,
+                "grossPnl": 37.35755893593251,
+                "commission": 1.5750000000000002,
+                "pnl": 35.78255893593251,
+                "exitReason": "EOD",
+                "duration": 7162735,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 2,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 5.96121580807729,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 61.284569208393606,
+          "dailyPnl": 1470.8296610014465
+        },
+        "optimizedScore": 37.19319595737715,
+        "optimizedSharpe": 2.5,
+        "optimizedDrawdownScore": 30.642284604196803,
+        "optimizedConfig": {
+          "longVolumeThresholdUSDT": 68,
+          "shortVolumeThresholdUSDT": 100,
+          "tradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 6,
+          "slPercent": 1,
+          "priceOffsetBps": 5,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 0.041666666666666664
+      },
+      {
+        "symbol": "ETHUSDT",
+        "currentLong": 50,
+        "currentShort": 225840,
+        "optimizedLong": 75,
+        "optimizedShort": 338760,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 100,
+        "currentMargin": 1000,
+        "currentLeverage": 25,
+        "currentTp": 5,
+        "currentSl": 1.5,
+        "currentLongMaxPositions": 10,
+        "currentShortMaxPositions": 10,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 100,
+        "optimizedMargin": 1000,
+        "optimizedLeverage": 25,
+        "optimizedTp": 3,
+        "optimizedSl": 1.5,
+        "optimizedLongMaxPositions": 10,
+        "optimizedShortMaxPositions": 10,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": -25.59509155083454,
+        "shortImprovement": 46.95851967413907,
+        "totalDailyImprovement": 21.363428123304516,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 6,
+            "wins": 6,
+            "losses": 0,
+            "totalPnl": 332.76101821151514,
+            "winRate": 100,
+            "avgWin": 55.46016970191919,
+            "avgLoss": 0,
+            "avgDuration": 255.54505,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ETHUSDT",
+                "side": "LONG",
+                "entryPrice": 3394.09,
+                "exitPrice": 3465.5,
+                "triggerPrice": 3465.5,
+                "slippage": 0,
+                "grossPnl": 52.59878200047719,
+                "commission": 1.5750000000000002,
+                "pnl": 51.02378200047719,
+                "exitReason": "EOD",
+                "duration": 7381764,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ETHUSDT",
+                "side": "LONG",
+                "entryPrice": 3399.57,
+                "exitPrice": 3465.5,
+                "triggerPrice": 3465.5,
+                "slippage": 0,
+                "grossPnl": 48.484072985701005,
+                "commission": 1.5750000000000002,
+                "pnl": 46.909072985701,
+                "exitReason": "EOD",
+                "duration": 7175932,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ETHUSDT",
+                "side": "LONG",
+                "entryPrice": 3430.97,
+                "exitPrice": 3465.5,
+                "triggerPrice": 3465.5,
+                "slippage": 0,
+                "grossPnl": 25.160523117369287,
+                "commission": 1.5750000000000002,
+                "pnl": 23.585523117369288,
+                "exitReason": "EOD",
+                "duration": 5847277,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 5,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 1.8121309650917024,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 1,
+            "wins": 0,
+            "losses": 1,
+            "totalPnl": -52.51249999999953,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": -52.51249999999953,
+            "avgDuration": 329.7475,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ETHUSDT",
+                "side": "SHORT",
+                "entryPrice": 3462.65,
+                "exitPrice": 3532.1626987499994,
+                "triggerPrice": 3514.5897499999996,
+                "slippage": 17.572948749999796,
+                "grossPnl": -50.187499999999524,
+                "commission": 2.325,
+                "pnl": -52.51249999999953,
+                "exitReason": "SL",
+                "duration": 19784850,
+                "margin": 100,
+                "volatilityFactor": 0.5
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 1,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 52.51249999999953,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 280.2485182115156,
+          "dailyPnl": 250.6080562929568
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 7,
+            "wins": 7,
+            "losses": 0,
+            "totalPnl": 304.1386882405091,
+            "winRate": 100,
+            "avgWin": 43.44838403435845,
+            "avgLoss": 0,
+            "avgDuration": 201.13331666666667,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ETHUSDT",
+                "side": "LONG",
+                "entryPrice": 3406.3691400000002,
+                "exitPrice": 3465.5,
+                "triggerPrice": 3465.5,
+                "slippage": 0,
+                "grossPnl": 43.397278428843265,
+                "commission": 1.5750000000000002,
+                "pnl": 41.82227842884326,
+                "exitReason": "EOD",
+                "duration": 7175932,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ETHUSDT",
+                "side": "LONG",
+                "entryPrice": 3430.97,
+                "exitPrice": 3465.5,
+                "triggerPrice": 3465.5,
+                "slippage": 0,
+                "grossPnl": 25.160523117369287,
+                "commission": 1.5750000000000002,
+                "pnl": 23.585523117369288,
+                "exitReason": "EOD",
+                "duration": 5847277,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ETHUSDT",
+                "side": "LONG",
+                "entryPrice": 3427.13058,
+                "exitPrice": 3465.5,
+                "triggerPrice": 3465.5,
+                "slippage": 0,
+                "grossPnl": 27.98946458585187,
+                "commission": 1.5750000000000002,
+                "pnl": 26.41446458585187,
+                "exitReason": "EOD",
+                "duration": 4239775,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 6,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 2.865793975899269,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "recentTrades": [],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 304.1386882405091,
+          "dailyPnl": 271.9714844162613
+        },
+        "optimizedScore": 181.44433261590768,
+        "optimizedSharpe": 1.4328969879496345,
+        "optimizedDrawdownScore": 152.06934412025456,
+        "optimizedConfig": {
+          "volumeThresholdUSDT": 100,
+          "longVolumeThresholdUSDT": 75,
+          "shortVolumeThresholdUSDT": 338760,
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 1000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 1.5,
+          "priceOffsetBps": 10,
+          "usePostOnly": true,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "useThreshold": false,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 1.1182741782407408
+      },
+      {
+        "symbol": "BTCUSDT",
+        "currentLong": 125,
+        "currentShort": 75,
+        "optimizedLong": 125,
+        "optimizedShort": 75,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 100,
+        "currentMargin": 1000,
+        "currentLeverage": 25,
+        "currentTp": 3,
+        "currentSl": 1.5,
+        "currentLongMaxPositions": 10,
+        "currentShortMaxPositions": 10,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 100,
+        "optimizedMargin": 1000,
+        "optimizedLeverage": 25,
+        "optimizedTp": 3,
+        "optimizedSl": 1.5,
+        "optimizedLongMaxPositions": 10,
+        "optimizedShortMaxPositions": 10,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 0,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 0,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 3,
+            "wins": 3,
+            "losses": 0,
+            "totalPnl": 40.43381735050278,
+            "winRate": 100,
+            "avgWin": 13.477939116834259,
+            "avgLoss": 0,
+            "avgDuration": 103.77473888888888,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "BTCUSDT",
+                "side": "LONG",
+                "entryPrice": 101221.9,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 15.105426790052496,
+                "commission": 1.5750000000000002,
+                "pnl": 13.530426790052495,
+                "exitReason": "EOD",
+                "duration": 7394733,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "LONG",
+                "entryPrice": 101060.2,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 19.12968705781314,
+                "commission": 1.5750000000000002,
+                "pnl": 17.55468705781314,
+                "exitReason": "EOD",
+                "duration": 7195941,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "LONG",
+                "entryPrice": 101390.4762,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 10.923703502637148,
+                "commission": 1.5750000000000002,
+                "pnl": 9.348703502637147,
+                "exitReason": "EOD",
+                "duration": 4088779,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 3,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 4.0229239511678365,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 5,
+            "wins": 5,
+            "losses": 0,
+            "totalPnl": 140.23360592946065,
+            "winRate": 100,
+            "avgWin": 28.04672118589213,
+            "avgLoss": 0,
+            "avgDuration": 271.4855033333333,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "BTCUSDT",
+                "side": "SHORT",
+                "entryPrice": 102519.5,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 16.728524817229893,
+                "commission": 1.5750000000000002,
+                "pnl": 15.153524817229894,
+                "exitReason": "EOD",
+                "duration": 9513877,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "SHORT",
+                "entryPrice": 102727.8,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 21.763826344962194,
+                "commission": 1.5750000000000002,
+                "pnl": 20.188826344962195,
+                "exitReason": "EOD",
+                "duration": 6213699,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "SHORT",
+                "entryPrice": 102631.9,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 19.448144290420284,
+                "commission": 1.5750000000000002,
+                "pnl": 17.873144290420285,
+                "exitReason": "EOD",
+                "duration": 3360831,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 4,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 1.325140262810017,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "totalPnl": 180.66742327996343,
+          "dailyPnl": 184.02848415728766
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 3,
+            "wins": 3,
+            "losses": 0,
+            "totalPnl": 40.43381735050278,
+            "winRate": 100,
+            "avgWin": 13.477939116834259,
+            "avgLoss": 0,
+            "avgDuration": 103.77473888888888,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "BTCUSDT",
+                "side": "LONG",
+                "entryPrice": 101221.9,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 15.105426790052496,
+                "commission": 1.5750000000000002,
+                "pnl": 13.530426790052495,
+                "exitReason": "EOD",
+                "duration": 7394733,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "LONG",
+                "entryPrice": 101060.2,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 19.12968705781314,
+                "commission": 1.5750000000000002,
+                "pnl": 17.55468705781314,
+                "exitReason": "EOD",
+                "duration": 7195941,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "LONG",
+                "entryPrice": 101390.4762,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 10.923703502637148,
+                "commission": 1.5750000000000002,
+                "pnl": 9.348703502637147,
+                "exitReason": "EOD",
+                "duration": 4088779,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 3,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 4.0229239511678365,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 5,
+            "wins": 5,
+            "losses": 0,
+            "totalPnl": 140.23360592946065,
+            "winRate": 100,
+            "avgWin": 28.04672118589213,
+            "avgLoss": 0,
+            "avgDuration": 271.4855033333333,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "BTCUSDT",
+                "side": "SHORT",
+                "entryPrice": 102519.5,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 16.728524817229893,
+                "commission": 1.5750000000000002,
+                "pnl": 15.153524817229894,
+                "exitReason": "EOD",
+                "duration": 9513877,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "SHORT",
+                "entryPrice": 102727.8,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 21.763826344962194,
+                "commission": 1.5750000000000002,
+                "pnl": 20.188826344962195,
+                "exitReason": "EOD",
+                "duration": 6213699,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "BTCUSDT",
+                "side": "SHORT",
+                "entryPrice": 102631.9,
+                "exitPrice": 101833.5,
+                "triggerPrice": 101833.5,
+                "slippage": 0,
+                "grossPnl": 19.448144290420284,
+                "commission": 1.5750000000000002,
+                "pnl": 17.873144290420285,
+                "exitReason": "EOD",
+                "duration": 3360831,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 4,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 1.325140262810017,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "totalPnl": 180.66742327996343,
+          "dailyPnl": 184.02848415728766
+        },
+        "optimizedScore": 109.20266360007474,
+        "optimizedSharpe": 2.6740321069889266,
+        "optimizedDrawdownScore": 90.33371163998171,
+        "optimizedConfig": {
+          "volumeThresholdUSDT": 100,
+          "longVolumeThresholdUSDT": 125,
+          "shortVolumeThresholdUSDT": 75,
+          "tradeSize": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "maxPositionMarginUSDT": 1000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 1.5,
+          "priceOffsetBps": 10,
+          "usePostOnly": true,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "useThreshold": false,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 0.9817361921296296
+      },
+      {
+        "symbol": "SUIUSDT",
+        "currentLong": 30,
+        "currentShort": 100,
+        "optimizedLong": 30,
+        "optimizedShort": 100,
+        "currentTradeSize": 111,
+        "currentLongTradeSize": 111,
+        "currentShortTradeSize": 111,
+        "currentMargin": 999,
+        "currentLeverage": 25,
+        "currentTp": 5,
+        "currentSl": 0.25,
+        "currentLongMaxPositions": 9,
+        "currentShortMaxPositions": 9,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 111,
+        "optimizedLongTradeSize": 111,
+        "optimizedShortTradeSize": 111,
+        "optimizedMargin": 999,
+        "optimizedLeverage": 25,
+        "optimizedTp": 5,
+        "optimizedSl": 0.25,
+        "optimizedLongMaxPositions": 9,
+        "optimizedShortMaxPositions": 9,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 0,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 0,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 133.25549999999967,
+            "winRate": 100,
+            "avgWin": 133.25549999999967,
+            "avgLoss": 0,
+            "avgDuration": 34.37891666666667,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "SUIUSDT",
+                "side": "LONG",
+                "entryPrice": 1.925602,
+                "exitPrice": 2.0198602179,
+                "triggerPrice": 2.0218821,
+                "slippage": 0.002021882100000205,
+                "grossPnl": 135.83624999999967,
+                "commission": 2.58075,
+                "pnl": 133.25549999999967,
+                "exitReason": "TP",
+                "duration": 2062735,
+                "margin": 111,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 133.25549999999967,
+          "dailyPnl": 3198.1319999999923
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 133.25549999999967,
+            "winRate": 100,
+            "avgWin": 133.25549999999967,
+            "avgLoss": 0,
+            "avgDuration": 34.37891666666667,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "SUIUSDT",
+                "side": "LONG",
+                "entryPrice": 1.925602,
+                "exitPrice": 2.0198602179,
+                "triggerPrice": 2.0218821,
+                "slippage": 0.002021882100000205,
+                "grossPnl": 135.83624999999967,
+                "commission": 2.58075,
+                "pnl": 133.25549999999967,
+                "exitReason": "TP",
+                "duration": 2062735,
+                "margin": 111,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 133.25549999999967,
+          "dailyPnl": 3198.1319999999923
+        },
+        "optimizedScore": 79.9532999999998,
+        "optimizedSharpe": 0,
+        "optimizedDrawdownScore": 66.62774999999984,
+        "optimizedConfig": {
+          "longVolumeThresholdUSDT": 30,
+          "shortVolumeThresholdUSDT": 100,
+          "tradeSize": 111,
+          "maxPositionMarginUSDT": 999,
+          "leverage": 25,
+          "tpPercent": 5,
+          "slPercent": 0.25,
+          "priceOffsetBps": 5,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "longTradeSize": 111,
+          "shortTradeSize": 111,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 0.041666666666666664
+      },
+      {
+        "symbol": "XRPUSDT",
+        "currentLong": 100,
+        "currentShort": 50,
+        "optimizedLong": 100,
+        "optimizedShort": 50,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 100,
+        "currentMargin": 10000,
+        "currentLeverage": 25,
+        "currentTp": 3,
+        "currentSl": 0.25,
+        "currentLongMaxPositions": 100,
+        "currentShortMaxPositions": 100,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 100,
+        "optimizedMargin": 10000,
+        "optimizedLeverage": 25,
+        "optimizedTp": 3,
+        "optimizedSl": 0.25,
+        "optimizedLongMaxPositions": 100,
+        "optimizedShortMaxPositions": 100,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 0,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 0,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "short": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 50.56222836902014,
+            "winRate": 100,
+            "avgWin": 50.56222836902014,
+            "avgLoss": 0,
+            "avgDuration": 93.89603333333334,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "XRPUSDT",
+                "side": "SHORT",
+                "entryPrice": 2.5126,
+                "exitPrice": 2.4602,
+                "triggerPrice": 2.4602,
+                "slippage": 0,
+                "grossPnl": 52.13722836902014,
+                "commission": 1.5750000000000002,
+                "pnl": 50.56222836902014,
+                "exitReason": "EOD",
+                "duration": 5633762,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 1,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "totalPnl": 50.56222836902014,
+          "dailyPnl": 1213.4934808564833
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "short": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 50.56222836902014,
+            "winRate": 100,
+            "avgWin": 50.56222836902014,
+            "avgLoss": 0,
+            "avgDuration": 93.89603333333334,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "XRPUSDT",
+                "side": "SHORT",
+                "entryPrice": 2.5126,
+                "exitPrice": 2.4602,
+                "triggerPrice": 2.4602,
+                "slippage": 0,
+                "grossPnl": 52.13722836902014,
+                "commission": 1.5750000000000002,
+                "pnl": 50.56222836902014,
+                "exitReason": "EOD",
+                "duration": 5633762,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 0,
+              "EOD": 1,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "totalPnl": 50.56222836902014,
+          "dailyPnl": 1213.4934808564833
+        },
+        "optimizedScore": 30.337337021412083,
+        "optimizedSharpe": 0,
+        "optimizedDrawdownScore": 25.28111418451007,
+        "optimizedConfig": {
+          "longVolumeThresholdUSDT": 100,
+          "shortVolumeThresholdUSDT": 50,
+          "tradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 3,
+          "slPercent": 0.25,
+          "priceOffsetBps": 5,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 0.041666666666666664
+      },
+      {
+        "symbol": "SOLUSDT",
+        "currentLong": 50,
+        "currentShort": 100,
+        "optimizedLong": 50,
+        "optimizedShort": 100,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 100,
+        "currentMargin": 10000,
+        "currentLeverage": 25,
+        "currentTp": 4.5,
+        "currentSl": 1.25,
+        "currentLongMaxPositions": 100,
+        "currentShortMaxPositions": 100,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 100,
+        "optimizedMargin": 10000,
+        "optimizedLeverage": 25,
+        "optimizedTp": 4.5,
+        "optimizedSl": 1.25,
+        "optimizedLongMaxPositions": 100,
+        "optimizedShortMaxPositions": 100,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 0,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 0,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 107.56249999999986,
+            "winRate": 100,
+            "avgWin": 107.56249999999986,
+            "avgLoss": 0,
+            "avgDuration": 34.214733333333335,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "SOLUSDT",
+                "side": "LONG",
+                "entryPrice": 148.9930914,
+                "exitPrice": 155.542082732487,
+                "triggerPrice": 155.697780513,
+                "slippage": 0.15569778051300887,
+                "grossPnl": 109.88749999999986,
+                "commission": 2.325,
+                "pnl": 107.56249999999986,
+                "exitReason": "TP",
+                "duration": 2052884,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 107.56249999999986,
+          "dailyPnl": 2581.4999999999964
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 1,
+            "wins": 1,
+            "losses": 0,
+            "totalPnl": 107.56249999999986,
+            "winRate": 100,
+            "avgWin": 107.56249999999986,
+            "avgLoss": 0,
+            "avgDuration": 34.214733333333335,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "SOLUSDT",
+                "side": "LONG",
+                "entryPrice": 148.9930914,
+                "exitPrice": 155.542082732487,
+                "triggerPrice": 155.697780513,
+                "slippage": 0.15569778051300887,
+                "grossPnl": 109.88749999999986,
+                "commission": 2.325,
+                "pnl": 107.56249999999986,
+                "exitReason": "TP",
+                "duration": 2052884,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 1,
+              "SL": 0,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": null
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 107.56249999999986,
+          "dailyPnl": 2581.4999999999964
+        },
+        "optimizedScore": 64.53749999999991,
+        "optimizedSharpe": 0,
+        "optimizedDrawdownScore": 53.78124999999993,
+        "optimizedConfig": {
+          "longVolumeThresholdUSDT": 50,
+          "shortVolumeThresholdUSDT": 100,
+          "tradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 25,
+          "tpPercent": 4.5,
+          "slPercent": 1.25,
+          "priceOffsetBps": 5,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 0.041666666666666664
+      },
+      {
+        "symbol": "ASTERUSDT",
+        "currentLong": 125,
+        "currentShort": 1360,
+        "optimizedLong": 125,
+        "optimizedShort": 1360,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 0.69,
+        "currentMargin": 10000,
+        "currentLeverage": 20,
+        "currentTp": 6,
+        "currentSl": 1.5,
+        "currentLongMaxPositions": 100,
+        "currentShortMaxPositions": 14492,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 0.69,
+        "optimizedMargin": 10000,
+        "optimizedLeverage": 20,
+        "optimizedTp": 6,
+        "optimizedSl": 1.5,
+        "optimizedLongMaxPositions": 100,
+        "optimizedShortMaxPositions": 14492,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 0,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 0,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 21,
+            "wins": 9,
+            "losses": 12,
+            "totalPnl": 461.66606313017047,
+            "winRate": 42.857142857142854,
+            "avgWin": 92.59274292192153,
+            "avgLoss": -30.972385263926927,
+            "avgDuration": 209.92953174603176,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ASTERUSDT",
+                "side": "LONG",
+                "entryPrice": 1.10791,
+                "exitPrice": 1.0944,
+                "triggerPrice": 1.0944,
+                "slippage": 0,
+                "grossPnl": -24.3882625845058,
+                "commission": 1.2600000000000002,
+                "pnl": -25.6482625845058,
+                "exitReason": "EOD",
+                "duration": 7189022,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ASTERUSDT",
+                "side": "LONG",
+                "entryPrice": 1.09031,
+                "exitPrice": 1.0944,
+                "triggerPrice": 1.0944,
+                "slippage": 0,
+                "grossPnl": 7.502453430675954,
+                "commission": 1.2600000000000002,
+                "pnl": 6.242453430675953,
+                "exitReason": "EOD",
+                "duration": 277939,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ASTERUSDT",
+                "side": "LONG",
+                "entryPrice": 1.0856,
+                "exitPrice": 1.0944,
+                "triggerPrice": 1.0944,
+                "slippage": 0,
+                "grossPnl": 16.2122328666178,
+                "commission": 1.2600000000000002,
+                "pnl": 14.9522328666178,
+                "exitReason": "EOD",
+                "duration": 14735,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 7,
+              "SL": 7,
+              "EOD": 7,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0.32151782392817585,
+            "maxDrawdown": 204.82862316712266,
+            "maxDrawdownPercent": 31.74161214429302,
+            "profitFactor": 2.2421443036975965
+          },
+          "short": {
+            "totalTrades": 1,
+            "wins": 0,
+            "losses": 1,
+            "totalPnl": -0.2898689999999958,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": -0.2898689999999958,
+            "avgDuration": 201.57928333333334,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ASTERUSDT",
+                "side": "SHORT",
+                "entryPrice": 1.13841,
+                "exitPrice": 1.1612635807499996,
+                "triggerPrice": 1.1554861499999998,
+                "slippage": 0.005777430749999812,
+                "grossPnl": -0.2770349999999958,
+                "commission": 0.012833999999999998,
+                "pnl": -0.2898689999999958,
+                "exitReason": "SL",
+                "duration": 12094757,
+                "margin": 0.69,
+                "volatilityFactor": 0.5137810480922403
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 1,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0.2898689999999958,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 461.37619413017046,
+          "dailyPnl": 408.74485793245725
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 21,
+            "wins": 9,
+            "losses": 12,
+            "totalPnl": 461.66606313017047,
+            "winRate": 42.857142857142854,
+            "avgWin": 92.59274292192153,
+            "avgLoss": -30.972385263926927,
+            "avgDuration": 209.92953174603176,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ASTERUSDT",
+                "side": "LONG",
+                "entryPrice": 1.10791,
+                "exitPrice": 1.0944,
+                "triggerPrice": 1.0944,
+                "slippage": 0,
+                "grossPnl": -24.3882625845058,
+                "commission": 1.2600000000000002,
+                "pnl": -25.6482625845058,
+                "exitReason": "EOD",
+                "duration": 7189022,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ASTERUSDT",
+                "side": "LONG",
+                "entryPrice": 1.09031,
+                "exitPrice": 1.0944,
+                "triggerPrice": 1.0944,
+                "slippage": 0,
+                "grossPnl": 7.502453430675954,
+                "commission": 1.2600000000000002,
+                "pnl": 6.242453430675953,
+                "exitReason": "EOD",
+                "duration": 277939,
+                "margin": 100,
+                "volatilityFactor": null
+              },
+              {
+                "symbol": "ASTERUSDT",
+                "side": "LONG",
+                "entryPrice": 1.0856,
+                "exitPrice": 1.0944,
+                "triggerPrice": 1.0944,
+                "slippage": 0,
+                "grossPnl": 16.2122328666178,
+                "commission": 1.2600000000000002,
+                "pnl": 14.9522328666178,
+                "exitReason": "EOD",
+                "duration": 14735,
+                "margin": 100,
+                "volatilityFactor": null
+              }
+            ],
+            "exitReasons": {
+              "TP": 7,
+              "SL": 7,
+              "EOD": 7,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0.32151782392817585,
+            "maxDrawdown": 204.82862316712266,
+            "maxDrawdownPercent": 31.74161214429302,
+            "profitFactor": 2.2421443036975965
+          },
+          "short": {
+            "totalTrades": 1,
+            "wins": 0,
+            "losses": 1,
+            "totalPnl": -0.2898689999999958,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": -0.2898689999999958,
+            "avgDuration": 201.57928333333334,
+            "activePositions": 0,
+            "recentTrades": [
+              {
+                "symbol": "ASTERUSDT",
+                "side": "SHORT",
+                "entryPrice": 1.13841,
+                "exitPrice": 1.1612635807499996,
+                "triggerPrice": 1.1554861499999998,
+                "slippage": 0.005777430749999812,
+                "grossPnl": -0.2770349999999958,
+                "commission": 0.012833999999999998,
+                "pnl": -0.2898689999999958,
+                "exitReason": "SL",
+                "duration": 12094757,
+                "margin": 0.69,
+                "volatilityFactor": 0.5137810480922403
+              }
+            ],
+            "exitReasons": {
+              "TP": 0,
+              "SL": 1,
+              "EOD": 0,
+              "LIQUIDATED": 0
+            },
+            "sharpeRatio": 0,
+            "maxDrawdown": 0.2898689999999958,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 461.37619413017046,
+          "dailyPnl": 408.74485793245725
+        },
+        "optimizedScore": 231.1846357529842,
+        "optimizedSharpe": 0.16075891196408792,
+        "optimizedDrawdownScore": 2.2415550715487993,
+        "optimizedConfig": {
+          "longVolumeThresholdUSDT": 125,
+          "shortVolumeThresholdUSDT": 1360,
+          "tradeSize": 100,
+          "shortTradeSize": 0.69,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 20,
+          "tpPercent": 6,
+          "slPercent": 1.5,
+          "priceOffsetBps": 5,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": false,
+          "vwapTimeframe": "1m",
+          "vwapLookback": 100,
+          "useThreshold": false,
+          "forceMarketEntry": false,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000,
+          "longTradeSize": 100
+        },
+        "spanDays": 1.1287632986111111
+      },
+      {
+        "symbol": "1000BONKUSDT",
+        "currentLong": 100,
+        "currentShort": 100,
+        "optimizedLong": 100,
+        "optimizedShort": 100,
+        "currentTradeSize": 100,
+        "currentLongTradeSize": 100,
+        "currentShortTradeSize": 100,
+        "currentMargin": 10000,
+        "currentLeverage": 10,
+        "currentTp": 3,
+        "currentSl": 2,
+        "currentLongMaxPositions": 100,
+        "currentShortMaxPositions": 100,
+        "currentTimeWindow": 60000,
+        "currentCooldown": 30000,
+        "optimizedTradeSize": 100,
+        "optimizedLongTradeSize": 100,
+        "optimizedShortTradeSize": 100,
+        "optimizedMargin": 10000,
+        "optimizedLeverage": 10,
+        "optimizedTp": 3,
+        "optimizedSl": 2,
+        "optimizedLongMaxPositions": 100,
+        "optimizedShortMaxPositions": 100,
+        "optimizedTimeWindow": 60000,
+        "optimizedCooldown": 30000,
+        "longImprovement": 0,
+        "shortImprovement": 0,
+        "totalDailyImprovement": 0,
+        "currentPerformance": {
+          "long": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 0,
+          "dailyPnl": 0
+        },
+        "optimizedPerformance": {
+          "long": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "short": {
+            "totalTrades": 0,
+            "wins": 0,
+            "losses": 0,
+            "totalPnl": 0,
+            "winRate": 0,
+            "avgWin": 0,
+            "avgLoss": 0,
+            "avgDuration": 0,
+            "activePositions": 0,
+            "sharpeRatio": 0,
+            "maxDrawdown": 0,
+            "maxDrawdownPercent": 0,
+            "profitFactor": 0
+          },
+          "totalPnl": 0,
+          "dailyPnl": 0
+        },
+        "optimizedScore": 0,
+        "optimizedSharpe": 0,
+        "optimizedDrawdownScore": 0,
+        "optimizedConfig": {
+          "longVolumeThresholdUSDT": 100,
+          "shortVolumeThresholdUSDT": 100,
+          "tradeSize": 100,
+          "maxPositionMarginUSDT": 10000,
+          "leverage": 10,
+          "tpPercent": 3,
+          "slPercent": 2,
+          "priceOffsetBps": 5,
+          "maxSlippageBps": 50,
+          "orderType": "LIMIT",
+          "vwapProtection": true,
+          "vwapTimeframe": "5m",
+          "vwapLookback": 100,
+          "longTradeSize": 100,
+          "shortTradeSize": 100,
+          "thresholdTimeWindow": 60000,
+          "thresholdCooldown": 30000
+        },
+        "spanDays": 0.041666666666666664
+      }
+    ]
+  },
+  "recommendedMaxOpenPositions": 8,
+  "optimizedConfig": {
+    "api": {
+      "apiKey": "946d48e6ee632d70576aeb44b5ea6e1d11d1d137486fbb28a44d6a462610a82f",
+      "secretKey": "cd1d1dfbf53f31f170fea8050e2858452f7921b11b161165f86e047a486b49b8"
+    },
+    "symbols": {
+      "BTCUSDT": {
+        "volumeThresholdUSDT": 100,
+        "longVolumeThresholdUSDT": 125,
+        "shortVolumeThresholdUSDT": 75,
+        "tradeSize": 100,
+        "longTradeSize": 100,
+        "shortTradeSize": 100,
+        "maxPositionMarginUSDT": 1000,
+        "leverage": 25,
+        "tpPercent": 3,
+        "slPercent": 1.5,
+        "priceOffsetBps": 10,
+        "usePostOnly": true,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "useThreshold": false,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      },
+      "ETHUSDT": {
+        "volumeThresholdUSDT": 100,
+        "longVolumeThresholdUSDT": 75,
+        "shortVolumeThresholdUSDT": 338760,
+        "tradeSize": 100,
+        "longTradeSize": 100,
+        "shortTradeSize": 100,
+        "maxPositionMarginUSDT": 1000,
+        "leverage": 25,
+        "tpPercent": 3,
+        "slPercent": 1.5,
+        "priceOffsetBps": 10,
+        "usePostOnly": true,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "useThreshold": false,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      },
+      "SUIUSDT": {
+        "longVolumeThresholdUSDT": 30,
+        "shortVolumeThresholdUSDT": 100,
+        "tradeSize": 111,
+        "maxPositionMarginUSDT": 999,
+        "leverage": 25,
+        "tpPercent": 5,
+        "slPercent": 0.25,
+        "priceOffsetBps": 5,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "longTradeSize": 111,
+        "shortTradeSize": 111,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      },
+      "XRPUSDT": {
+        "longVolumeThresholdUSDT": 100,
+        "shortVolumeThresholdUSDT": 50,
+        "tradeSize": 100,
+        "maxPositionMarginUSDT": 10000,
+        "leverage": 25,
+        "tpPercent": 3,
+        "slPercent": 0.25,
+        "priceOffsetBps": 5,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "longTradeSize": 100,
+        "shortTradeSize": 100,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      },
+      "SOLUSDT": {
+        "longVolumeThresholdUSDT": 50,
+        "shortVolumeThresholdUSDT": 100,
+        "tradeSize": 100,
+        "maxPositionMarginUSDT": 10000,
+        "leverage": 25,
+        "tpPercent": 4.5,
+        "slPercent": 1.25,
+        "priceOffsetBps": 5,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "longTradeSize": 100,
+        "shortTradeSize": 100,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      },
+      "ASTERUSDT": {
+        "longVolumeThresholdUSDT": 125,
+        "shortVolumeThresholdUSDT": 1360,
+        "tradeSize": 100,
+        "shortTradeSize": 0.69,
+        "maxPositionMarginUSDT": 10000,
+        "leverage": 20,
+        "tpPercent": 6,
+        "slPercent": 1.5,
+        "priceOffsetBps": 5,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "useThreshold": false,
+        "forceMarketEntry": false,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000,
+        "longTradeSize": 100
+      },
+      "1000BONKUSDT": {
+        "longVolumeThresholdUSDT": 100,
+        "shortVolumeThresholdUSDT": 100,
+        "tradeSize": 100,
+        "maxPositionMarginUSDT": 10000,
+        "leverage": 10,
+        "tpPercent": 3,
+        "slPercent": 2,
+        "priceOffsetBps": 5,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": true,
+        "vwapTimeframe": "5m",
+        "vwapLookback": 100,
+        "longTradeSize": 100,
+        "shortTradeSize": 100,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      },
+      "BNBUSDT": {
+        "longVolumeThresholdUSDT": 68,
+        "shortVolumeThresholdUSDT": 100,
+        "tradeSize": 100,
+        "maxPositionMarginUSDT": 10000,
+        "leverage": 25,
+        "tpPercent": 6,
+        "slPercent": 1,
+        "priceOffsetBps": 5,
+        "maxSlippageBps": 50,
+        "orderType": "LIMIT",
+        "vwapProtection": false,
+        "vwapTimeframe": "1m",
+        "vwapLookback": 100,
+        "longTradeSize": 100,
+        "shortTradeSize": 100,
+        "thresholdTimeWindow": 60000,
+        "thresholdCooldown": 30000
+      }
+    },
+    "global": {
+      "riskPercent": 5,
+      "paperMode": true,
+      "positionMode": "HEDGE",
+      "maxOpenPositions": 8,
+      "useThresholdSystem": false,
+      "server": {
+        "dashboardPassword": "Hotkarl!1",
+        "dashboardPort": 10000,
+        "websocketPort": 10001,
+        "useRemoteWebSocket": false,
+        "websocketHost": null
+      },
+      "rateLimit": {
+        "maxRequestWeight": 2400,
+        "maxOrderCount": 1200,
+        "reservePercent": 30,
+        "enableBatching": true,
+        "queueTimeout": 30000,
+        "enableDeduplication": true,
+        "deduplicationWindowMs": 1000,
+        "parallelProcessing": true,
+        "maxConcurrentRequests": 3
+      }
+    },
+    "version": "1.1.0"
+  }
+}

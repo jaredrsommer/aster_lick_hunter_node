@@ -6,6 +6,7 @@ import { Config } from '../lib/types';
 import { StatusBroadcaster } from './websocketServer';
 import { initializeBalanceService, stopBalanceService, getBalanceService } from '../lib/services/balanceService';
 import { initializePriceService, stopPriceService, getPriceService } from '../lib/services/priceService';
+import { initializePaperBalanceService, getPaperBalanceService } from '../lib/services/paperBalanceService';
 import { vwapStreamer } from '../lib/services/vwapStreamer';
 import { getPositionMode, setPositionMode } from '../lib/api/positionMode';
 import { execSync } from 'child_process';
@@ -210,7 +211,39 @@ logErrorWithTimestamp('Failed to initialize balance service:', error);
           );
           // Continue anyway - bot can work without balance service
         }
+      }
 
+      // Initialize paper balance service for paper mode
+      if (this.config.global.paperMode) {
+        try {
+logWithTimestamp('Initializing paper balance service...');
+          const startingBalance = 10000; // Default starting balance
+          await initializePaperBalanceService(startingBalance);
+
+          // Connect paper balance service to status broadcaster
+          const paperBalanceService = getPaperBalanceService();
+          if (paperBalanceService) {
+            paperBalanceService.on('balance:update', (balanceData) => {
+logWithTimestamp('[Bot] Broadcasting paper balance update via WebSocket');
+              this.statusBroadcaster.broadcast('balance_update', balanceData);
+            });
+          }
+logWithTimestamp('✅ Paper balance service initialized and connected to WebSocket broadcaster');
+        } catch (error) {
+logErrorWithTimestamp('Failed to initialize paper balance service:', error);
+          this.statusBroadcaster.broadcastApiError(
+            'Paper Balance Service Initialization Failed',
+            'Failed to initialize paper balance service. Some features may be unavailable.',
+            {
+              component: 'AsterBot',
+              rawError: error,
+            }
+          );
+          // Continue anyway - bot can work without paper balance service
+        }
+      }
+
+      if (hasValidApiKeys) {
         // Check and set position mode
         try {
           this.isHedgeMode = await getPositionMode(this.config.api);
@@ -471,16 +504,10 @@ logErrorWithTimestamp('⚠️  Telegram Bot Service failed to initialize:', erro
         this.statusBroadcaster.broadcastThresholdUpdate(thresholdUpdate);
       });
 
-      this.hunter.on('positionOpened', (data: any) => {
+      this.hunter.on('positionOpened', async (data: any) => {
         logWithTimestamp(`📈 Position opened: ${data.symbol} ${data.side} qty=${data.quantity}`);
-        this.positionManager?.onNewPosition(data);
-        this.statusBroadcaster.broadcastPositionUpdate({
-          symbol: data.symbol,
-          side: data.side,
-          quantity: data.quantity,
-          price: data.price,
-          type: 'opened'
-        });
+        await this.positionManager?.onNewPosition(data);
+        // Note: PositionManager now handles broadcasting position updates with full data
         this.statusBroadcaster.logActivity(`Position opened: ${data.symbol} ${data.side}`);
         this.statusBroadcaster.updateStatus({
           positionsOpen: (this.statusBroadcaster as any).status.positionsOpen + 1,
@@ -731,6 +758,12 @@ logWithTimestamp('✅ Position Manager config updated');
           await vwapStreamer.updateSymbols(newConfig);
 logWithTimestamp('✅ VWAP symbols updated');
         }
+      }
+
+      // Update Telegram service with new config
+      if (newConfig.global.telegram) {
+        telegramService.updateConfig(newConfig.global.telegram);
+logWithTimestamp('✅ Telegram config updated');
       }
 
       // Broadcast config update to web UI

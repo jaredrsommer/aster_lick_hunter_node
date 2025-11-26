@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRateLimitManager } from '@/lib/api/rateLimitManager';
-import { withAuth } from '@/lib/auth/with-auth';
 
-export const GET = withAuth(async (_request: NextRequest, _user) => {
+export async function GET(_request: NextRequest) {
   try {
     const rateLimitManager = getRateLimitManager();
 
@@ -91,7 +90,7 @@ export const GET = withAuth(async (_request: NextRequest, _user) => {
       message: error.message || 'Unknown error'
     }, { status: 500 });
   }
-});
+}
 
 // Add dynamic route revalidation
 export const dynamic = 'force-dynamic';

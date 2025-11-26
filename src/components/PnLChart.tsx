@@ -421,6 +421,7 @@ export default function PnLChart() {
   // Handle empty data state
   if (!pnlData || chartData.length === 0) {
     const isApiKeysMissing = !hasApiKeys;
+    const isPaperMode = config?.global?.paperMode;
 
     return (
       <Card>
@@ -483,7 +484,9 @@ export default function PnLChart() {
                     ? 'Complete setup to view data'
                     : pnlData?.error
                       ? `Error: ${pnlData.error}`
-                      : `${timeRange} period`
+                      : isPaperMode
+                        ? 'Start trading to see performance data'
+                        : `No trades in ${timeRange} period`
                   }
                 </Badge>
               </div>

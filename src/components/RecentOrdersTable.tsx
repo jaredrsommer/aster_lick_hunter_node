@@ -74,47 +74,94 @@ export default function RecentOrdersTable({ maxRows: _maxRows = 50 }: RecentOrde
 
       const limitToUse = isLoadMore ? currentLimit + LOAD_MORE_INCREMENT : 50;
 
-      // Handle REDUCE filter separately - it's a custom filter, not a real order status
-      // For REDUCE filter, we need to fetch FILLED orders and then filter client-side
-      const actualStatusFilter = statusFilter === 'REDUCE' ? 'FILLED' : statusFilter;
+      // Check if we're in paper mode
+      const isPaperMode = _config?.global?.paperMode === true;
 
-      // Set filters in store
-      orderStore.setFilters({
-        status: actualStatusFilter === 'ALL' ? undefined : actualStatusFilter as OrderStatus,
-        symbol: symbolFilter === 'ALL' ? undefined : symbolFilter,
-        limit: limitToUse,
-      });
+      if (isPaperMode) {
+        // Fetch paper trades instead of real orders
+        const params = new URLSearchParams();
 
-      // Fetch orders
-      await orderStore.fetchOrders(force);
-      let filteredOrders = orderStore.getFilteredOrders();
+        // Map status filter to paper trade status
+        if (statusFilter === 'FILLED' || statusFilter === 'ALL') {
+          params.append('status', 'closed');
+        }
+        if (symbolFilter !== 'ALL') {
+          params.append('symbol', symbolFilter);
+        }
+        params.append('limit', limitToUse.toString());
 
-      // If REDUCE filter is active, filter to only reduce-only orders
-      if (statusFilter === 'REDUCE') {
-        filteredOrders = filteredOrders.filter(order => {
-          // Check if this is a reduce-only order (closing/reducing position)
-          const hasRealizedPnL = order.realizedProfit !== undefined &&
-                                 order.realizedProfit !== null &&
-                                 order.realizedProfit !== '' &&
-                                 order.realizedProfit !== '0';
+        const response = await fetch(`/api/paper-trades?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch paper trades');
+        }
 
-          // Check if it's a reduce-only order or SL/TP type
-          const isReduceOrder = order.reduceOnly ||
-                               order.type === OrderType.STOP_MARKET ||
-                               order.type === OrderType.TAKE_PROFIT_MARKET ||
-                               order.type === 'STOP' ||
-                               order.type === 'TAKE_PROFIT' ||
-                               order.closePosition;
+        const paperTrades = await response.json();
 
-          return hasRealizedPnL || isReduceOrder;
+        // Transform paper trades to Order format
+        const transformedOrders: Order[] = paperTrades.map((trade: any) => ({
+          orderId: trade.id,
+          symbol: trade.symbol,
+          side: trade.side === 'BUY' ? OrderSide.BUY : OrderSide.SELL,
+          type: OrderType.MARKET,
+          status: trade.status === 'closed' ? OrderStatus.FILLED : OrderStatus.NEW,
+          price: trade.entry_price?.toString() || '0',
+          avgPrice: trade.exit_price?.toString() || trade.entry_price?.toString() || '0',
+          origQty: trade.quantity?.toString() || '0',
+          executedQty: trade.quantity?.toString() || '0',
+          cumQuote: ((trade.quantity || 0) * (trade.exit_price || trade.entry_price || 0)).toString(),
+          time: trade.opened_at || Date.now(),
+          updateTime: trade.closed_at || trade.opened_at || Date.now(),
+          realizedProfit: trade.pnl?.toString() || '0',
+          positionSide: trade.position_side || 'BOTH',
+          closePosition: trade.status === 'closed',
+          reduceOnly: trade.status === 'closed',
+        }));
+
+        setOrders(transformedOrders);
+        setHasMore(transformedOrders.length >= limitToUse);
+      } else {
+        // Handle REDUCE filter separately - it's a custom filter, not a real order status
+        // For REDUCE filter, we need to fetch FILLED orders and then filter client-side
+        const actualStatusFilter = statusFilter === 'REDUCE' ? 'FILLED' : statusFilter;
+
+        // Set filters in store
+        orderStore.setFilters({
+          status: actualStatusFilter === 'ALL' ? undefined : actualStatusFilter as OrderStatus,
+          symbol: symbolFilter === 'ALL' ? undefined : symbolFilter,
+          limit: limitToUse,
         });
+
+        // Fetch orders
+        await orderStore.fetchOrders(force);
+        let filteredOrders = orderStore.getFilteredOrders();
+
+        // If REDUCE filter is active, filter to only reduce-only orders
+        if (statusFilter === 'REDUCE') {
+          filteredOrders = filteredOrders.filter(order => {
+            // Check if this is a reduce-only order (closing/reducing position)
+            const hasRealizedPnL = order.realizedProfit !== undefined &&
+                                   order.realizedProfit !== null &&
+                                   order.realizedProfit !== '' &&
+                                   order.realizedProfit !== '0';
+
+            // Check if it's a reduce-only order or SL/TP type
+            const isReduceOrder = order.reduceOnly ||
+                                 order.type === OrderType.STOP_MARKET ||
+                                 order.type === OrderType.TAKE_PROFIT_MARKET ||
+                                 order.type === 'STOP' ||
+                                 order.type === 'TAKE_PROFIT' ||
+                                 order.closePosition;
+
+            return hasRealizedPnL || isReduceOrder;
+          });
+        }
+
+        // Show orders from all symbols, not just configured ones
+        setOrders(filteredOrders);
+
+        // Check if there are more orders to load
+        setHasMore(filteredOrders.length >= limitToUse);
       }
-
-      // Show orders from all symbols, not just configured ones
-      setOrders(filteredOrders);
-
-      // Check if there are more orders to load
-      setHasMore(filteredOrders.length >= limitToUse);
 
       if (isLoadMore) {
         setCurrentLimit(limitToUse);
@@ -126,7 +173,7 @@ export default function RecentOrdersTable({ maxRows: _maxRows = 50 }: RecentOrde
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [statusFilter, symbolFilter, currentLimit, LOAD_MORE_INCREMENT]);
+  }, [statusFilter, symbolFilter, currentLimit, LOAD_MORE_INCREMENT, _config]);
 
   // Initial load
   useEffect(() => {
